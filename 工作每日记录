@@ -639,6 +639,7 @@ command + O 查找class（类）
 command + option + O 查找方法
 command + shift + delete 查看最后一次编辑的地方
 command + B 或者 左键 进入光标所在的方法/变量接口或定义处
+command + option + B 跳转到方法实现处
 control + shift + B 跳转到类型声明处
 command + Y 快速打开光标所在方法、类的定义
 command + U 前往当前光标所在方法的父类的方法 / 接口定义
@@ -771,3 +772,20 @@ context_params（备用参数以便以后添加参数来使用）
 ls_refund_order:refund_to_credit;（退款到余额里面）
 
 日志编程是否要看一下
+
+interface ---> implements --> 具体 疑问？
+
+看码心得：
+首先先要定义一个接口， 接口内部定义好需要的方法
+例：
+public interface PrepayOrderQueryService {
+
+
+    /**
+     * 查询订单信息
+     *
+     * @param orderQueryReq
+     * @return
+     */
+    OrderQueryResp queryOrderDetail(OrderQueryReq orderQueryReq);
+}
