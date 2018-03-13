@@ -750,7 +750,7 @@ sudo service mysqld stop;
 sudo service mysqld restart;
 
 
-业务方：客户？
+业务方：(流程图图上红色的都是业务方。)
 一：
 跳转参数 id jump_params
 AUTO_INCREMENT=81670
@@ -774,10 +774,13 @@ ls_refund_order:refund_to_credit;（退款到余额里面）
 日志编程是否要看一下
 
 interface ---> implements --> 具体 疑问？
+public class OrderQueryResp extends BaseResp implements Serializable???
+baseRequest?
 
 看码心得：
 首先先要定义一个接口， 接口内部定义好需要的方法
 例：
+PrepayOrderQueryService.java
 public interface PrepayOrderQueryService {
 
 
@@ -789,3 +792,6 @@ public interface PrepayOrderQueryService {
      */
     OrderQueryResp queryOrderDetail(OrderQueryReq orderQueryReq);
 }
+
+
+ls_pct_prepayorder  <------->  PrepayOrderPO.java
