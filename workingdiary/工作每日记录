@@ -1,0 +1,773 @@
+Maven项目的目录骨架约定
+
+MavenProjectRoot(项目根目录)
+   |----src
+   |     |----main
+   |     |         |----java ——存放项目的.java文件
+   |     |         |----resources ——存放项目资源文件，如spring, hibernate配置文件
+   |     |----test
+   |     |         |----java ——存放所有测试.java文件，如JUnit测试类
+   |     |         |----resources ——存放项目资源文件，如spring, hibernate配置文件
+   |----target ——项目输出位置
+   |----pom.xml ----用于标识该项目是一个Maven项目
+
+POM文件：
+groupId, artifactId version.//packaging
+groupId定义属于哪个组
+artifactId定义项目在组中唯一的ID
+version制定了xxxx项目当前的版本--SNAPSHOT意为项目还处于开发中，不稳定版本
+//packaging
+
+mvn -v
+     compile
+     test
+     package 打包成jar
+     clean 删除target
+     install 安装jar包到本地仓库中
+
+创建目录的两种方式：
+1.mvn archetype:generate
+2.mvn archetype: -DgroupId = xxx -DartifactId = xxx -Dversion = xxx -Dpackage = xxx;
+
+maven生命周期
+clean 清理项目
+default 构建项目
+site 生成项目站点
+
+execution plugins 用否？
+<excutions> <excutions>
+  <execution>
+    <phase>package</phase>
+    <goals>
+      <goal>run</goal>
+    </goals>
+  </execution>
+
+<packaging> --jar war pom zip
+<name></name>
+<url></url>
+<description></description>
+<developers></developers>
+<licenses></licenses>
+<organization></organization>
+
+<dependencies>
+  <dependency>
+    <groupId></groupId>
+    <artifactID></artifactId>
+    <version></version>
+    <type></type>
+    <scope>test</scope>//六种 compile为默认  provided runtime test system imort
+    <optional></optional>//默认为false 可依赖
+    <exclusions>坐标</exclusions>防止传递依赖 排除依赖
+    例：
+    <exclusions>
+      <exclusions>
+          <groupId></groupId>
+        <artifactId></artifactId>
+      </exclusions>
+    </exclusions>
+
+
+<parent></parent> 继承pom
+<modules></modules> 指定多个模块一起进行编译
+
+依赖以最短路径为主：1.A-B-C-X(jar) 2.A-D-X(jar) 会走第二条路
+
+聚合 一起install：
+<packaging>pom</packaging>
+<modules>
+  <moudle> maven名字</moudle>
+  <moudle> maven名字</moudle>
+  <moudle> maven名字</moudle>
+<module>
+修改setting.xml文件 可使默认jdk 变为你想要的（3-8）。
+
+
+问题：
+确认：
+代码中：
+
+<groupId>com.alibaba</groupId>
+<artifactId>fastjson</artifactId>
+
+<groupId>commons-codec</groupId>
+<artifactId>commons-codec</artifactId>
+<version>1.4</version>
+commons-codec-1.4.jar
+会从中央仓库下载吗？
+
+<packaging> --jar war pom zip 区别
+
+本地仓库如何看？
+~/.m2/repository
+
+Spring看的方向：
+springboot springmvc springcloud
+
+IOC控制反转 bean装配 AOP面向切面 AspectJ
+
+Feb.27:
+Spring 注入：
+  -设置注入?写法
+  -构造注入?
+xml文件写在哪里？
+
+JUnit 测试？
+IntelliJ IDE 基础使用。
+Xml方式还是@。。。commnent也要
+@RunWith
+
+Bean配置项 作用域 生命周期 自动装配 Resources&ResourceLoader
+Bean ： Id
+        Class//必须的
+        Scope
+        Constructor arguments
+        Properties
+        Autowiring modelVersion
+        lazy-initialization modelVersion
+
+作用域： singleton 只存在一份
+        prototype 每次都会创建的
+        request：http创建一个实例并仅在当前request内有效
+        session：
+        global session
+
+Aware?
+
+自动装配(Autowiring) No, byname, byType, Constructor
+
+Resources
+  --UrlResource
+  --ClassPathResource
+  --FileSystemResource
+  --ServletContextResource
+  --InputStreamResource
+  --ByteArrayResource
+
+ResourceLoader
+
+@Configuration @Bean @Import @DependsOn
+@Component
+@Repository @Service @Controller
+
+类的自动检测及Bean的注册
+Spring可以自动检测类并注册Bean到ApplicationContext中
+
+<context:component-scan base-package="org.example"> 定义哪个包下面
+使用过滤器进行自定义扫描
+<context:include-filter type = "regex">
+<context:exclude-filter type = "annotation">
+
+定义Bean
+
+Autowired 注解
+Spring BeanPostProcessor处理，不能再自己BeanPostProcessor 或 BeanFactoryPostProcessor
+类型应用这些注解
+
+@Qualifer注解缩小范围 适用于fields， constructors， multi-argument methods
+
+@Bean 标识一个用于配置和初始化一个由SpringIoC容器管理的新对象的方法
+@Configuration配置文件
+
+CustomAutowireConfigurer
+
+JSR-250@Resource
+@PostConstruct
+@PreDestory
+
+feb.28
+Mybatis 的 SqlSession
+作用 ：
+  1.向SQL语句传入参数
+  2.执行SQL语句
+  3.获取执行SQL语句的结果
+  4.事务的控制
+
+public class DBAccess {
+  public SqlSession getSqlSession() throws IOException {
+      ///通过配置文件获取数据库连接信息
+    Reader reader = Resources.getResourceAsReader("com/imooc/config/Configuration.xml");
+      //通过配置信息构建一个SqlSessionFactory
+      SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+      //通过sqlSessionFactory打开一个数据库会话
+      SqlSession sqlSession = sqlSessionFactory.openSession();
+      return sqlSession;
+  }
+}
+
+SQL基本配置与执行
+MessageDao.java
+public class MessageDao {
+  public List<Message> queryMessageList(String command, String description) {
+    DBAccess dbAccess = new DBAccess();
+    List<Message> messageList = new ArrayList<Message>();要先配好映射关系
+    SqlSession sqlSession = null;
+    try {
+      sqlSession = dbAccess.getSqlSession();
+      //通过sqlSession执行SQL语句
+      sqlSession.selectList("queryMessageList"); --MessageDao.xml 中的id
+      //messageList = sqlSession.selectList("queryMessageList");
+      sqlSession.selectList("Message.queryMessageList"); 通过.来加namespace
+    } catch (IOException e) {
+      //TODO Auto-generated catch block
+      e.printStackTrace();
+    } finally {
+      if(sqlSession != null) {
+        sqlSession.close();
+      }
+    }
+    return messageList;
+  }
+}
+Message.xml
+通过<mapper namespace = "Message"> namespace 加以区别
+
+代替jdbc
+动态sql拼接
+OGNL表达式（单独） EL表达式
+Mybatis OGNL表达式
+String与基本数据类型 _parameter
+自定义类型(Message) 属性名(command)
+集合                数组：array
+                    List:list
+                    Map:_parameter
+操作符  java常用操作符 + 特有的操作符 and ,or ,mod ,in ,not in
+
+从集合中取出一条数据    数组： array[索引](String[])
+                            array[索引].属性名(Message[])
+                    List： list[索引](List<String>)
+                           list[索引].属性名(List<Message>)
+                    Map:   _parameter.key(Map<String, Message>)
+                            key.属性名(Map<String, Message>)
+利用 foreach 标签    <foreach collection = "array" index = "i" item = "item">
+从集合中取出数据       数组
+                    List     i:索引(下标)            item
+                    Map      i: key                item.属性名
+&quot;&quot;双引号
+&amp;&amp; --- && 或者直接写and
+COMMAND = #{command} ---  ？
+
+使用Maven 在pom.xml中加入<dependency>
+<dependency>
+  <groupId>org.mybatis</groupId>
+  <artifactId>mybatis-spring</artifactId>
+  <version>x.x.x</version>
+</dependency>
+
+
+
+log4j调试动态no
+
+Spring MVC
+Front Controller
+  DispatcherServlet(前段控制器)
+Controller
+  HandlerAdapter
+HandlerInterceptor(拦截器)。
+
+HandlerMapping()
+1. Help DispatcherServlet to get the right controller
+2. Wrap controller with HandlerInterceptor
+
+HandlerExecutionChain
+
+preHandle ---> Controller method ---> postHandle ---> afterCompletion
+
+ModelAndView
+
+ViewResolver(告诉DispatcherServlet哪个视图对象)
+
+View
+
+//mvc-dispatcher-servlet.xml
+<context:annotation-config/> 激活 标注bean 申明
+
+<mac:annotation-driven/>
+
+
+
+问题：classPath具体是指从哪里到哪里。
+
+项目源代码问题：
+pay-cashier:
+10 pom 为了一起安装子的pom？
+20-35行 怎么定义的？ lion pigeon cat zebra repo env
+${lion.client.version} 表达式
+102-135
+181-217 jakarta? 这些包都是从setting.xml设定的中央仓库直接下载的是吗？
+dependencyManagement的目的就是为了导入前面property的版本？ 所以如果version数字手打，就不需要是吗？
+340 为什么pay-cashier没有source文件，但build里面还是设置了。
+343 不用${basedir}/src/main/resources
+350 true?
+358 configuration 里面的设置具体不一样？（again）
+416 distributionManagement 用于让pom执行deploy功能？ 具体内容。
+
+pay-cashier-service:
+15 war包？
+124 parent已经用了，为什么还要再写一遍？
+247 profiles 的使用。
+具体内部code 怎么看？
+
+Spring版本号？是否为自己的？
+march 1
+ORM：对象关系映射（Object Relation Mapping）
+properties配置加载
+environment环境配置
+settings参数设置配置
+typeAliases别名设置
+mapper映射加载
+
+查询数据
+-- 映射配置：sql片段
+-- 映射配置： select配置
+    --特殊配置：字段和属性不一致时resultMap配置？
+Mybatis 开发环境搭建顺序：
+1.mybatis配置
+mybatis.xml主配置文件
+2.SqlSessionFactorBuilder
+3.1，2结合成SqlSessionFactory
+4.SqlSession
+SQL 语句已经提前配置到Mapper.xml中 DataBase 交换数据
+SQL 输出结果器
+//一定要一一对应嘛？
+
+问题：
+DAO？？？
+
+通过Java的而不是XML定义bean，比如
+@Configuration @Bean @Import, @DependsOn
+@Components是一个通用注解，可用于任何bean
+@Repository， @ Service, @Controller 更有针对性的注释
+---@Repository通常用于注解DAO类， 即持久层
+---@Service通常用于注解Service类， 即服务层
+---@controller通常用于Controller类，即控制层(MVC)
+Spring Autowired:
+
+类的自动检测及Bean的注册：
+Spring可以自动检测类并注册Bean 到 ApplicationContext中
+
+spring-config.xml 文件中
+<context:annotation-config/>仅会查找在同一个applicatcontext中的bean注释
+
+<context:component-scan base-package = "org.example"/>扫描这个包下的所有类，用了这个不用前面的了
+使用过滤器：
+<beans>
+  <context:component-scan base-package = "org.example">
+    <context:include-filter type = "regex"
+              expression =".*Stub.*Repository"/>
+    <context:exclude-filter type = "annotation"
+              expression = "org.springframework.stereotype.Repository"/>//所有用Repository注解的类
+  </context:component - scan>
+</beans>
+
+有annotation assignable aspectj regex custom
+例如：
+@Service("myMovieLister")  这里myMovieLister就是id
+public class SimpleMovieLister {
+  //....
+}
+@Respository   没指定的话就自动id取首字母小写movieFinderImpl
+public class MovieFinderImpl implements MovieFinder {
+  //....
+}
+如果要自定义命名规则，则要包含如下：
+<beans>
+  <context:component-scan base-package = "org.example"
+        name-generator = "org.example.MyNameGenerator" />
+</beans>
+作用域（Scope）
+例：
+@Scope("prototype")
+@Respository
+public class MovieFinderImpl implements MovieFinder {
+  // ....
+}
+
+自定义scope默认值
+<beans>
+  <context:component-scan base-package = "org.example"
+        scope-generator = "org.example.MyScopeGenerator" />
+</beans>
+
+代理方式（略 4-1）
+
+@Required注解适用于bean属性的setter方法
+这个注解仅仅表示，受影响的bean属性必须在配置时被填充，通过在bean定义或通过自动装配一个明确d额属性值
+
+@Autowired注解为传统的setter方法 -----其实就是另一个方面来说是注入直接，getBean内部东西
+ 也可以用在构造器或成员变量
+
+ @Autowired 注解那些众所周知的解析依赖性接口： BeanFactory， ApplicationContext, Environment, ResourceLoader
+ ApplicationEventPublisher, MessageSource
+
+ @Autowired 会把所有子类都打包
+ 用@order可排序 BeanImplOne
+
+ @Qualifer 用于缩小范围
+ 例@Autowired
+   @qualifer("指定id!")
+
+
+  Spring 结合My Batis部分：
+  <!--创建一个sql会话工厂bean，指定数据源 -->
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <!-- 1指定数据源 -->
+    <property name="dataSource" ref="jdbcDataSource" />
+    <!-- 2类型别名包，默认引入com.zhangguo.Spring61.entities下的所有类 -->
+    <property name="typeAliasesPackage" value="com.zhangguo.Spring61.entities"></property>
+    <!-- 3指定sql映射xml文件的路径 -->
+    <property name="mapperLocations"
+        value="classpath:com/zhangguo/Spring61/mapping/*Mapper.xml"></property>
+</bean>
+
+tomap grouping by
+
+grouping by 返回key value
+reduce reducing
+
+读书会重点概括：
+是否和spring功能有些类似 action class method/action
+
+lambda表达式概述：
+Every thing is object. all code associated with classes and objects.
+定义， 写法为啥， 内容，
+
+第八章：
+匿名类 很繁琐 ，Lambda 表达式可读性更好。比如Collection.sort(abc, new comparator());不用override 这么写了直接用
+匿名类中，this是本身。匿名类可以屏蔽包含类的变量。 int num 问题： 坏处用lambda表达式外面定义过了里面就不行
+
+int num=10;
+    Runnable runnable=() -> {
+        int num=5;//报错 Lambda expression's local variable num cannot redeclare another local variable defined in an enclosing scope.
+        System.out.println(num);
+    };
+
+String api
+https://www.jianshu.com/p/d5df677c7a99
+
+Lambda intface 里面多人 不知道是哪个，具体要指定问题：
+doSomething((Runnable) () ->System.out.println("identity who?"));
+doSomething((Task) () ->System.out.println("identity who?"));
+
+调试：
+不好处： Lambda表达式没有名字， 栈跟踪时报错是，系统会随便给你一个名字。
+
+第九章：
+Java8中的默认方法可以让类自动地继承接口的一个默认实现。
+就是接口中添加默认方法，实现他的类不用做任何修改，如果需要可以直接调用。
+
+Java8中抽象类与抽象接口的区别
+1.一个类只能继承一个抽象类，但可以实现多个接口。（原来不就是这样的嘛？）
+2.一个抽象类可以通过实例变量保存一个通用状态，而接口不可以有实例变量。
+
+默认方法的冲突问题，先要明确几个原则： interface A 和 interface B 都有hello（）这一个默认方法
+1.类中的方法优先级最高。
+2.第1条无法判断，那么子接口的优先级高于任何声明为默认方法的优先级。
+3.若前两条还是无法判断，继承多个接口的类必须通过显示覆和调用期望的方法，显示地选择哪一个默认方法的实现
+
+10-12章；
+
+
+
+
+Spring MVC配置：
+主要是WEB-INF目录下： dispatcher-servlet.xml文件
+
+
+
+
+Spring MVC数据绑定
+
+
+Tomcat---是一个WEB容器，JavaEE程序可以在此运行。 ----servlet的解析
+
+git---是一款免费、开源的分布式版本控制系统
+特点，可以有效、高速的处理从很小到非常大的项目的版本管理
+
+git常用命令：
+1、 切换分支：git checkout 分支名
+2. 拉取：git pull
+3. 提交 git push
+
+
+In previous note MyBatis Basic, we get SqlSessionFactory by SqlSessionFactoryBuilder:
+
+String resource = "path/to/mybatis-config.xml";
+InputStream inputStream = Resources.getResourceAsStream(resource);
+SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+
+But in MyBatis-Spring xml, bean SqlSessionFactory is created by SqlSessionFactoryBean:
+
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="dataSource" ref="dataSource" /> <!-- Obliged -->
+    <!-- Indicate location of mapper files where exists mysql statements -->
+    <property name="mapperLocations" value="classpath*:/mybatis/*Mapper.xml"/>
+    <!-- Indicate mybatis config files where exists typeAliases, settings, etc -->
+    <property name="configLocation" value="classpath:/mybatis/mybatis-config.xml"/>
+</bean>
+
+<!-- In java code, it does the following step to create SqlSessionFactory
+SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
+SqlSessionFactory sessionFactory = factoryBean.getObject();
+-->
+
+http://dongchuan.github.io/mybatis/2016/04/18/MyBatis-With-Spring.html
+
+
+!!!!!!!!
+http://hmkcode.com/mybatis-spring-xml-annotation-mapper/
+!!!!!
+
+
+搭建spring + mybatis 查询修改等功能 思路：
+1.建立maven工程 设置好pom文件（jar包 包括 MySQL， spring + mybatis）
+2.配置Spring-config.xml文件（定义datasource（数据库）， sqlSessionFactory， 和
+定义Mapper(MyBatis-config.xml)-->有两种方式一种是xml，一种是annotation）
+3.直接在Interface.java中定义好sql的方式(用spring 来生成bean)
+4.外面封一层，防止被直接浏览
+
+用注解来简化xml配置的时候,@Param注解的作用是给参数命名,参数命名后就能根据名字得到参数值,正确的将参数传入sql语句中
+我们先来看Mapper接口中的@Select方法
+
+package Mapper;
+
+public interface Mapper {
+
+@Select("select s_id id,s_name name,class_id classid from student where  s_name= #{aaaa} and class_id = #{bbbb}")
+    public Student select(@Param("aaaa") String name,@Param("bbbb")int class_id);
+
+@Delete......
+
+@Insert......
+
+}
+
+
+springMVC 学习概要
+1. web.xml 配置 spring dispatchservlet ,比如为:mvc-dispatcher
+2. mvc-dispatcher-servlet.xml 文件配置
+3. spring applicationContext.XML文件配置(与数据库相关，与mybatis sqlSessionFaction 整合，扫描所有mybatis mapper 文件等.)
+4. 编写controller 类
+5. 编写页面代码jsp.
+
+AOP的实现方式：
+预编译
+--aspectj
+运行期动态代理（SpringAOP， JbossAOP）
+
+
+jar包加载自动；
+
+SpringMVC 大纲：
+Request_mapping；
+RequestPamram注解
+RequestHeader注解
+CookieValue注解
+模型数据---ModelAndView 或 Map 或 SessionAttribute ModelAttribute
+
+Request_mapping， Rest，处理模型数据， 数据绑定及表单标签， 转换器和格式化， 验证器(JSR303)，
+文件上传，文件下载，整合Ckeditor且实现图片上传。
+
+http请求 进到提供的服务器里面 controller 怎么拿到参数 怎么返回 输出html json 序列号数据
+
+
+SpringMVC 结合任务二 思路：
+1.首先建表。
+2.搭建Maven工程， 导入对应包。
+3.配置web.xml文件，springmvc的前端控制器，拦截所有请求(DispatcherServlet).
+4.配置DispatcherServlet文件(Spring-servlet或dispatcherServlet-servlet.xml)文件也就是springMVC
+配置文件的设置。(web.xml指向springmvc.xml位置)
+-----以上为独立的spring mvc配置----------
+-----下面是spring+mybatis配置相对比较独立-----
+5.完成spring 配置文件的设置，把mybatis配置和spring配置可写在一起，完成bean的设置。
+6以下步骤重复任务二
+
+三四周知识点整理：
+pigeon：
+
+appcontext-client.xml serialize 序列化方法，但是序列结果往往是一样的。只是效率不一样，
+为了拿别人的方法数据等
+appcontext-server.xml 为了配置进来让别人使用实现
+entry 前面是key 后面是 value 为了能给他人取，
+下面是bean注入
+Repository 里面一般是业务操作实现。
+serialVersionUID = 1L;要设置一下。 没什么用其实（BaseRequest.java）
+
+zebra：------>Mybatis 封了一层 可控 查询可以异步(没用) 分库。
+主库---只用来写， 从库只用来读 dao层， GroupDataSource---读，写
+
+lion：业务平台， zookip 用于配置参数，api提供， 不需要重启系统就可以完成编译。
+
+cat（平台监控）：service 被调用了多少次，日志，业务大盘---曲线图problem出现在哪里。（黑线前天，蓝色今天）轮询 ，访问量比较
+是否正常.
+主动配置 transcation 默认， 发布一坟台机器（尤其是自己改过的代码，至少隔5分钟再发另一台）。
+catutil.logmetremcount支付回调， 自己打点查看的。
+
+logscan:(日志) 监控。收集日志，打点
+
+支付中心原理图：
+pay-mapi-web(主要是调用第三方app) pay-cashier-web(h5平台）外包一层，其实调用pay-cashier-service
+和 pay-gate-service两层东西
+
+pay-gate-service 具体统筹配置，分流给到底是支付宝，微信还是其他的类型。
+
+支付回调有两种，一种是主动回调，一种是被动回调。主动回调：我们调第三方消息，查看支付状态，
+被动回调，第三方来调我们的接口，url，来确定状态。
+
+1.退款，（我们这里）创单
+2.调第三方接口
+3.更新退款信息状态
+4.查退款结果，做最后的update
+
+三四周任务具体计划：
+1.pigeon，zebra 写一个简单接口
+2.lion，cat,logscan查看
+3.看一下cat的具体文档
+4.git的分支策略。
+5.看一下中间模块的各调用。
+6。database表 1.具体表内容，干嘛的 2.分析表之间的关系  结合1、2制作出ER图 3.
+
+看代码：
+快捷键设置：类查找，实现，调用，搜索。
+https://www.cnblogs.com/gisblogs/p/7091194.html
+搜索全部内容：shift两下；
+command + N 自动生成get set等方法
+control + O 重写父类方法
+option + 上 连续选中代码
+command + O 查找class（类）
+command + option + O 查找方法
+command + shift + delete 查看最后一次编辑的地方
+command + B 或者 左键 进入光标所在的方法/变量接口或定义处
+control + shift + B 跳转到类型声明处
+command + Y 快速打开光标所在方法、类的定义
+command + U 前往当前光标所在方法的父类的方法 / 接口定义
+如何看：
+api-service ---> prepayorderIml(具体实现一步一步往下看,一个方法一个方法看)
+order--->resposity--->CreatePreOrderModule
+
+verification较验， buildBeforePrePayContext构建上下文
+IBeforePrePayModule实现 find Usages；
+
+
+git 学习：
+创建
+touch README.md
+touch .gitignore
+git init
+git status
+git add . (或者你具体想要提交的文件名)
+git commit -am 'first commit init project'
+git remote add origin git@git.intra.im:quanju.gu/test.git
+git branch
+git push -u origin master
+git pull
+git push -u -f origin master (强制推送)
+git branch -r 看远处分支
+分支开发主干发布
+git checkout -b v1.0 origin/master (切换到新的分支)
+git branch
+git push origin HEAD -u
+
+发生冲突：
+git pull
+git diff可查看哪里不一样
+进去可以看哪里
+再来一次提交就可以了。
+
+git log 查看之前的修改
+复制commit id
+git reset --hard id 退回代码
+git reflog 查看当前版本的版本号
+---pull就是回到过去之前的
+git reset --hard id 回到未来
+
+建立里程碑：
+release 在界面；
+
+分支开发：
+创建分支，切到分支上
+merge
+
+是否需要安装依赖？
+
+yum -y install mysql-serialVersionUID
+
+rpm -qa| grep mysql-server (看是否安装成功)
+
+/etc/my.cnf默认文件是否在
+
+vim /etc/my.cnf
+添加配置，在【mysqld】节点下添加：
+default-character-set = utf8       5.1
+character-set-server = utf8        5.5
+:wq
+
+mysql安装
+chkconfig mysqld on
+chkconfig --list mysqld
+
+防火墙配置？
+
+
+mysql服务启动
+service mysqld start 或 /etc/rc.d/init.d/mysqld start
+
+mysql初始化环境配置
+mysql -u root -p 密码root
+
+查看当前mysql的用户
+select user,host,password from mysql.user
+修改root密码
+set password for root@localhost=password('youpassword');
+(3)exit
+删除匿名用户
+delete from mysql.user where user = '';
+刷新，使以上操作生效：flush privileges
+
+插入mysql新用户
+insert into mysql.user(Host,User,Password) values ("localhsot", "yourusername", password("yourpassword"));
+
+创建新的database
+CREATE DATEBASE `MALLLL`;
+
+10 本地用户赋予所有权限
+
+grant all privileges on mmall.* to yourusername@localhost identified by 'yourpassword'
+
+11.给账号开通外网所有权限
+grant all privileges on mmall.* to yourusername@'%' identified by 'yourpassword'
+
+12;
+grant select, insert on mmall.* to yourusername@'192.11.11.11' identified by 'yourpassword'
+
+ifconfig 查看mysql地址；
+
+常用命令：
+sudo service mysqld start;
+sudo service mysqld stop;
+sudo service mysqld restart;
+
+
+业务方：客户？
+一：
+跳转参数 id jump_params
+AUTO_INCREMENT=81670
+
+二：
+32 64？自定义的2的多少次方
+version：乐观锁
+五：
+sub_step_id 可能有多个步骤所以用
+context_info
+六：
+高4位主状态，低5位子状态？
+enable_pay limit_pay 允许支付渠道为啥用varchar？（暂时没用）
+七：risk（不用）
+八：token（不用）
+十：biz_config： json1，2，3？？ （作为json 一个数组来传送）
+十二 ls_pct_payorder：旧表？？？？？（是的，ls_pct_payorder为新表， ls_paycenter_order为旧表）
+context_params（备用参数以便以后添加参数来使用）
+ls_refund_order:refund_to_credit;（退款到余额里面）
+
+日志编程是否要看一下

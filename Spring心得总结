@@ -1,0 +1,41 @@
+Spring心得总结：
+核心思想：建立IOC容器来让IOC容器new类
+实施 创建spring-Config.xml来定义Bean。（Bean就是New出来的对象）。
+XML定义方式：
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id = "helloWorld" class = "HelloWorld">
+        <property name="name" value = "Spring"></property>
+    </bean>
+</beans>
+文件包含:Main.java HelloWolrd.java--里面有name变量
+
+！！！！！！！！！！！！
+用注释来定义Bean
+项目常用：
+@Component
+@Repository @Service @Controller
+用法：
+@Service("payOrderQueryService")
+public class PayOrderQueryServiceImpl implements PayOrderQueryService {
+.....
+括号不写，默认为首字母小写。
+
+<context:component-scan base-package = "org.example"/>扫描这个包下的所有类，用了这个不用前面的了
+<context:annotation-config/>
+过滤器使用
+
+@Autowired 会把所有子类都打包
+用@order可排序 BeanImplOne
+@Qualifer 用于缩小范围
+例@Autowired
+  @qualifer("指定id!")
+！！！！！！！！！！！
+
+获取方法：
+方法一：
+ApplicationContext context = new ClassPathXmlApplicationContext("classpath*:spring-config.xml");
+HelloWorld helloWorld = (HelloWorld) context.getBean("helloWorld");

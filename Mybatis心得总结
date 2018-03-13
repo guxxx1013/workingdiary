@@ -1,0 +1,25 @@
+MyBatis心得总结：
+核心思想：通过Mybatis的 SqlSessionFactory 和 sqlSession来执行sql语句，
+取到一一对应关系。
+
+配置Mybatis-config.xml()
+
+Setup SqlSessionFactory
+两种 只有Mybatis
+String resource = "path/to/mybatis-config.xml";
+InputStream inputStream = Resources.getResourceAsStream(resource);
+SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+
+这是Mybatis-结合Spring 写在Spring
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="dataSource" ref="dataSource" /> <!-- Obliged -->
+    <!-- Indicate location of mapper files where exists mysql statements -->
+    <property name="mapperLocations" value="classpath*:/mybatis/*Mapper.xml"/>
+    <!-- Indicate mybatis config files where exists typeAliases, settings, etc -->
+    <property name="configLocation" value="classpath:/mybatis/mybatis-config.xml"/>
+</bean>
+
+
+Define mappers：第一种方法可以直接写在mybatis-config.xml；
+Two ways to define:
+Annotation based 和 XML based
