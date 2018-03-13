@@ -657,7 +657,7 @@ touch .gitignore
 git init
 git status
 git add . (或者你具体想要提交的文件名)
-git commit -am 'first commit init project'
+git commit -am 'first commit init project' ///git commit -m "first commit"
 git remote add origin git@git.intra.im:quanju.gu/test.git
 git branch
 git push -u origin master
