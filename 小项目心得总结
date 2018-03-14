@@ -1,0 +1,188 @@
+Spring + Mybatis 综合查填删改
+1.建立maven工程 设置好pom文件（jar包 包括 MySQL， spring + mybatis）
+pom.xml文件导入需要用到的jar包；
+2.配置Spring-config.xml文件（定义datasource（数据库）， sqlSessionFactory， 和 定义Mapper(MyBatis-config.xml)-->有两种方式一种是xml，一种是annotation）
+配置Spring-config.xml初步：
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:oxm="http://www.springframework.org/schema/oxm"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:jee="http://www.springframework.org/schema/jee"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+  	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+  	http://www.springframework.org/schema/context
+  	http://www.springframework.org/schema/context/spring-context-3.1.xsd
+  	http://www.springframework.org/schema/tx
+  	http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+  	http://www.springframework.org/schema/aop
+  	http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+    http://www.springframework.org/schema/oxm
+    http://www.springframework.org/schema/oxm/spring-oxm-3.1.xsd
+  	http://www.springframework.org/schema/jdbc
+    http://www.springframework.org/schema/jdbc/spring-jdbc-3.1.xsd"
+>
+    <context:annotation-config />
+    <tx:annotation-driven />
+
+    <!-- step 1 datasource -->
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/user_info" />
+        <property name="username" value="root" />
+        <property name="password" value ="root" />
+     </bean>
+
+    <!-- step 2 sqlSessionFactory Mybatis的配置文件-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <!-- step 3 mapper!!!!!!!!!!  因为你没办法在class下面这个上面加@，所以这一层是不能被定义为注释的-->
+    <bean id = "mapper" class="org.mybatis.spring.mapper.MapperFactoryBean" >
+        <property name="mapperInterface" value="com.gu.spring.mybatis.mapper.UserMapper"/>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+
+    <bean id="service" class="com.gu.spring.mybatis.service.Service">
+    </bean>
+
+    <context:component-scan base-package = "com.gu.spring.mybatis"/>
+    <context:annotation-config/>
+
+</beans>
+
+建立数据库的表结构：
+CREATE TABLE  user(
+  user_id int(10) unsigned NOT NULL auto_increment,
+  email_id varchar(45) NOT NULL,
+  password varchar(45) NOT NULL,
+  first_name varchar(45) NOT NULL,
+  last_name varchar(45) default NULL,
+  PRIMARY KEY  (user_id),
+  UNIQUE KEY Index_2_email_uniq (email_id)
+)ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+创建对应的User.java
+public class User {
+    private Integer userId;
+    private String emailId;
+    private String password;
+    private String firstName;
+    private String lastName;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", emailId='" + emailId + '\'' +
+                ", password='" + password + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                '}';
+    }
+    public Integer getUserId() {
+        return userId;
+    }
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+    public String getEmailId() {
+        return emailId;
+    }
+    public void setEmailId(String emailId) {
+        this.emailId = emailId;
+    }
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    public String getFirstName() {
+        return firstName;
+    }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+    public String getLastName() {
+        return lastName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+}
+
+3.直接在Interface.java接口处定义好需要用到的sql的形式，
+public interface UserMapper {
+
+    public User getUserById(Integer userId);
+
+    public List<User> getAllUsers();
+
+    public void insertUser(User user);
+
+    public void updateUser(User user);
+
+    public void deleteUser(Integer userId);
+
+}
+补全spring-config.xml中的Step 3 和 Step 4；
+并完成mapper.xml配置。 定义里面需要用到的sql语句规范，id对应接口中的方法
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Mapper.java namespace-->
+<mapper namespace="com.gu.spring.mybatis.mapper.UserMapper">
+    <select id = "getUserById" parameterType = "int" resultType="com.gu.spring.mybatis.vo.User">
+        SELECT
+            user_id as userId,
+            email_id as emailId ,
+            password as password,
+            first_name as firstName,
+            last_name as lastName
+        FROM user
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertUser" parameterType = "com.gu.spring.mybatis.vo.User" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO user(email_id, password, first_name, last_name) VALUES (#{emailId}, #{password} #{password}, #{firstName}, #{lastName})
+    </insert>
+
+    <update id = "updateUser" parameterType="com.gu.spring.mybatis.vo.User">
+        UPDATE user
+        SET
+          email_id = #{emailId},
+          password = #{password},
+          first_name = #{firstName},
+          last_name = #{lastName}
+        WHERE user_id = #{userId}
+    </update>
+
+    <delete id = "deleteUser" parameterType="Integer">
+        DELETE FROM user WHERE user_id = #{userId}
+    </delete>
+
+    <resultMap type= "com.gu.spring.mybatis.vo.User" id='UserResult'>
+        <id property='userId' column='user_id'/>
+        <result property='emailId' column='email_id'/>
+        <result property='password' column='password'/>
+        <result property='firstName' column='first_name'/>
+        <result property='lastName' column='last_name'/>
+    </resultMap>
+
+    <select id = "getAllUsers" resultMap="UserResult">
+        SELECT * FROM user
+    </select>
+<!--
+    <select id = "getAllUsers" resultType="com.gu.spring.mybatis.vo.User">
+        SELECT * FROM user
+    </select>
+-->
+</mapper>
+并完成所需要用的bean注入。
+
+4.外面封一层，防止被直接浏览
