@@ -23,3 +23,92 @@ SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(input
 Define mappers：第一种方法可以直接写在mybatis-config.xml；
 Two ways to define:
 Annotation based 和 XML based
+
+基础语法解析：
+id对应的方法名； parameterType输入的类型。 resultType；输出类型。
+resultMap设计java对应变量名和数据库中的数据一一对应。
+
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Mapper.java namespace-->
+<mapper namespace="com.gu.spring.mybatis.mapper.UserMapper">
+    <select id = "getUserById" parameterType = "int" resultType="com.gu.spring.mybatis.vo.User">
+        SELECT
+            user_id as userId,
+            email_id as emailId ,
+            password as password,
+            first_name as firstName,
+            last_name as lastName
+        FROM user
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertUser" parameterType = "com.gu.spring.mybatis.vo.User" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO user(email_id, password, first_name, last_name) VALUES (#{emailId}, #{password} #{password}, #{firstName}, #{lastName})
+    </insert>
+
+    <update id = "updateUser" parameterType="com.gu.spring.mybatis.vo.User">
+        UPDATE user
+        SET
+          email_id = #{emailId},
+          password = #{password},
+          first_name = #{firstName},
+          last_name = #{lastName}
+        WHERE user_id = #{userId}
+    </update>
+
+    <delete id = "deleteUser" parameterType="Integer">
+        DELETE FROM user WHERE user_id = #{userId}
+    </delete>
+
+    <resultMap type= "com.gu.spring.mybatis.vo.User" id='UserResult'>
+        <id property='userId' column='user_id'/>
+        <result property='emailId' column='email_id'/>
+        <result property='password' column='password'/>
+        <result property='firstName' column='first_name'/>
+        <result property='lastName' column='last_name'/>
+    </resultMap>
+
+    <select id = "getAllUsers" resultMap="UserResult">
+        SELECT * FROM user
+    </select>
+
+
+<!--
+    <select id = "getAllUsers" resultType="com.gu.spring.mybatis.vo.User">
+        SELECT * FROM user
+    </select>
+-->
+
+</mapper>
+
+
+<sql id="selectSql">
+    SELECT
+          id,prepay_order_no,
+          biz_type,biz_order_id,biz_order_no,business_type,
+          pay_status,refund_status,
+          pay_time,notify_url,return_url,user_id,
+          total_pay_money,third_part_money,discount_money,
+          refund_amount,refund_frozen_amount,return_fail_url,
+          platform,pay_subject,pay_desc,
+          expire_time,user_ip,device_id,lng,lat,mq_biz_notify_status,
+          created_by,create_time,update_time,update_by
+    FROM LS_PCT_PrepayOrder
+</sql>
+自定义会用到很多次的sql语句
+使用
+<select id="queryByPrepayOrderNo" parameterType="string" resultType="com.lingshou.pay.cashier.po.PrepayOrderPO">
+     <include refid="selectSql"/>    ---->这里可以用上面语句对这里进行替换。
+       WHERE prepay_order_no = #{prepayOrderNo}
+</select>
+
+
+selectkey的用法：???
+http://blog.csdn.net/xu1916659422/article/details/77921912
+
+<![CDATA[ AND total_pay_money >= (refund_frozen_amount + refund_amount + #{refundFrozenAmount}) ]]>
+<![CDATA[      ]]> 防止里面东西被转义，一般用作> = < 上用
