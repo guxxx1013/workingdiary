@@ -801,3 +801,18 @@ public interface PrepayOrderQueryService {
 ls_pct_prepayorder  <------->  PrepayOrderPO.java
 ls_pct_payorder  <------> PayOrderDTOs.java
 ls_pct_payorder  <------>PayOrderNewQueryDTO.java
+ls_pct_payorder  <-------> payOrderNewPO.java
+
+api ---->   serviceImpl(module stratgy, ocuppy)  --->reposity ---> Mapper ---->Xml  ----->DB
+参数校验，逻辑service（BaseService）插表DB， 第三方， 更新DB，
+拼装返回。
+
+PO--->表
+BO--->新综合
+DTO--->要传给数据接受对方的表
+
+原来只有一张表                    预付两张表
+order只能1对1；        prepayOrder, payOrder为了能做到1对n
+
+最重要的两张表： ls_pct_prepayorder; ls_pct_payorder;
+旧表：ls_paycenter_order;
