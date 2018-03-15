@@ -690,6 +690,37 @@ release 在界面；
 创建分支，切到分支上
 merge
 
+Git global setup
+git config --global user.name "quanju.gu"
+git config --global user.email "quanju.gu@owitho.com"
+
+Create a new repository
+git clone git@git.intra.im:quanju.gu/test.git
+cd test
+touch README.md
+git add README.md
+git commit -m "add README"
+git push -u origin master
+
+Existing folder
+cd existing_folder
+git init
+git remote add origin git@git.intra.im:quanju.gu/test.git
+git add .
+git commit -m "Initial commit"
+git push -u origin master
+
+Existing Git repository
+cd existing_repo
+git remote rename origin old-origin
+git remote add origin git@git.intra.im:quanju.gu/test.git
+git push -u origin --all
+git push -u origin --tags
+
+
+
+
+
 是否需要安装依赖？
 
 yum -y install mysql-serialVersionUID
@@ -849,3 +880,19 @@ public static PaymentResultCode getInstance(int code) {
 
   放一下的问题：
   JSON.toJOSNString(tradeNo);
+
+  RefundOrderReadMapper.xml 中的if部分
+
+
+!!!!!!!BeforeRefundContext; refundOrderBean;
+ProStatus;RefundProStatus;
+IBeforeRefundModule;callBackContext
+end!
+
+RefundGateFactory.java 中为什么要用Qualifier注解？？？？？？？
+RefundGeneratorForAppAli.java :
+51 AlipayTradeRefundRequest req = generateAlipayTradeRefundRequest(context);
+ApipayClient里面的方法？
+
+RefundRuquestBeanForWxM
+@XmlTransient
