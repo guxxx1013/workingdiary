@@ -112,3 +112,8 @@ http://blog.csdn.net/xu1916659422/article/details/77921912
 
 <![CDATA[ AND total_pay_money >= (refund_frozen_amount + refund_amount + #{refundFrozenAmount}) ]]>
 <![CDATA[      ]]> 防止里面东西被转义，一般用作> = < 上用
+
+(PayTokenMapper.xml)
+  <select id="queryByPayOrderIdAndPayToken" parameterType="map" resultType="com.lingshou.pay.cashier.po.PayTokenPO">
+  为什么是map？可以传map数据到里面。
+  parameterType为入参类型。 resultType为出参类型。

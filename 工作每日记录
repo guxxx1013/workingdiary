@@ -810,3 +810,42 @@ order只能1对1；        prepayOrder, payOrder为了能做到1对n
 
 最重要的两张表： ls_pct_prepayorder; ls_pct_payorder;
 旧表：ls_paycenter_order;
+
+订单查询：（已完成）结构：
+PrepayOrderQueryService.java-->PayOrderQueryService.java--->PayOrderNewQueryRepository.java--->PayOrderNewMapper.java--->PayOrderNewMapper.xml
+
+
+问题：（PaymentResultCode.class）
+public static PaymentResultCode getInstance(int code) {
+      PaymentResultCode[] var1 = values();
+      int var2 = var1.length;
+
+      for(int var3 = 0; var3 < var2; ++var3) {
+          PaymentResultCode paymentResultCode = var1[var3];
+          if(paymentResultCode.getCode() == code) {
+              return paymentResultCode;
+          }
+      }
+
+      return null;
+  }
+
+  为什么是values();
+  PaymentResultCode[] var1 = PaymentResultCode.values();
+
+  <insert id="insert" parameterType="com.lingshou.pay.cashier.po.PayOrderPO">
+      <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+          SELECT LAST_INSERT_ID()
+      </selectKey>
+      INSERT INTO LS_PayCenter_Order (
+      biz_type,biz_order_id,trade_no,third_part_order_id,business_type,channel,method,pay_status,refund_status,pay_time,notify_url,return_url,user_id,total_pay_money,third_part_money,platform,pay_subject,pay_desc,expire_time,enable_pay,limit_pay,user_ip,created_by,create_time,update_time,update_by
+      ) VALUES (
+      #{bizType},#{bizOrderId},#{tradeNo},#{thirdPartOrderId},#{businessType},#{channel},#{method},#{payStatus},#{refundStatus},#{payTime},#{notifyUrl},#{returnUrl},#{userId},#{totalPayMoney},#{thirdPartMoney},#{platform},#{paySubject},#{payDesc},#{expireTime},#{enablePay},#{limitPay},#{userIp},#{createdBy},#{createTime},#{updateTime},#{updateBy}
+      )
+  </insert>
+
+  resultType ?????
+
+
+  放一下的问题：
+  JSON.toJOSNString(tradeNo);
