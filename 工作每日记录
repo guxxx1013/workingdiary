@@ -891,8 +891,9 @@ end!
 
 RefundGateFactory.java 中为什么要用Qualifier注解？？？？？？？
 RefundGeneratorForAppAli.java :
+done!
 51 AlipayTradeRefundRequest req = generateAlipayTradeRefundRequest(context);
 ApipayClient里面的方法？
 
-RefundRuquestBeanForWxM
+RefundRequestBeanForWxM
 @XmlTransient
