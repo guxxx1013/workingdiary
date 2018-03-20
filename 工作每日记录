@@ -643,6 +643,7 @@ command + option + B 跳转到方法实现处
 control + shift + B 跳转到类型声明处
 command + Y 快速打开光标所在方法、类的定义
 command + U 前往当前光标所在方法的父类的方法 / 接口定义
+command + shift + F 全project搜索
 如何看：
 api-service ---> prepayorderIml(具体实现一步一步往下看,一个方法一个方法看)
 order--->resposity--->CreatePreOrderModule
@@ -896,4 +897,89 @@ done!
 ApipayClient里面的方法？
 
 RefundRequestBeanForWxM
-@XmlTransient
+@XmlTransient 转译成Xml
+
+GetPayModeController.Java?????
+@CrossOrigin
+@ModelAttribute
+反josn数据？？？
+
+
+PayGateController作用？  paychannel?
+web工程能在本地跑吗？
+
+读书会总结：
+10章：
+Optional类
+Optional<T> 类(java.util.Optional) 是一个容器类，代表一个值存在或不存在，原来用null 表示一个值不存在，现在Optional 可以更好的表达这个概念。并且可以避免空指针异常。
+常用方法：
+Optional.of(T t) : 创建一个Optional 实例
+Optional.empty() : 创建一个空的Optional 实例
+Optional.ofNullable(T t):若t 不为null,创建Optional 实例,否则创建空实例
+isPresent() : 判断是否包含值
+orElse(T t) : 如果调用对象包含值，返回该值，否则返回t
+orElseGet(Supplier s) :如果调用对象包含值，返回该值，否则返回s 获取的值
+map(Function f): 如果有值对其处理，并返回处理后的Optional，否则返回Optional.empty()
+flatMap(Function mapper):与map 类似，要求返回值必须是Optional
+
+11章：
+CompletableFuture
+Java从Java 5版本就提供了Future接口。Future对于充分利用多核处理能力是非常有益的，因为它允许一个任务在一个新的核上生成一个新的子线程，新生成的任务可以和原来的任务同时运行。原来的任务需要结果时，它可以通过get方法等待Future运行结束（生成其计算的结果值）。
+Future接口的局限性
+
+使用Future中提供的方法完成这样的操作又是另外一回事。这也是我们需要更具描述能力的特性的原因，比如下面这些。
+
+将两个异步计算合并为一个——这两个异步计算之间相互独立，同时第二个又依赖于第一个的结果。
+等待Future集合中的所有任务都完成。
+仅等待Future集合中最快结束的任务完成（有可能因为它们试图通过不同的方式计算同一个值），并返回它的结果。
+通过编程方式完成一个Future任务的执行（即以手工设定异步操作结果的方式）。
+应对Future的完成事件（即当Future的完成事件发生时会收到通知，并能使用Future计算的结果进行下一步的操作，不只是简单地阻塞等待操作的结果）。
+
+CompletableFuture 详解
+一个非常有用，不过不那么精确的格言这么说：“Completable-Future对于Future的意义就像Stream之于Collection。”让我们比较一下这二者。
+通过Stream你可以对一系列的操作进行流水线，通过map、filter或者其他类似的方法提供行为参数化，它可有效避免使用迭代器时总是出现模板代码。
+类似地，CompletableFuture提供了像thenCompose、thenCombine、allOf这样的操作，对Future涉及的通用设计模式提供了函数式编程的细粒度控制，有助于避免使用命令式编程的模板代码。
+
+12章：
+新时间日期API
+使用LocalDate、LocalTime、LocalDateTime
+LocalDate、LocalTime、LocalDateTime 类的实例是不可变的对象，分别表示使用ISO-8601日历系统
+的日期、时间、日期和时间。它们提供了简单的日期或时间，并不包含当前的时间信息。也不包含与时区相关
+的信息
+Instant 时间戳
+用于“时间戳”的运算。它是以Unix元年(传统的设定为UTC时区1970年1月1日午夜时分)开始所经历的描述进行运算
+Duration 和Period
+Duration:用于计算两个“时间”间隔
+Period:用于计算两个“日期”间隔
+日期的操纵
+TemporalAdjuster : 时间校正器。有时我们可能需要获取例如：将日期调整到“下个周日”等操作。
+TemporalAdjusters : 该类通过静态方法提供了大量的常用TemporalAdjuster 的实现。
+例如获取下个周日
+解析与格式化
+java.time.format.DateTimeFormatter 类：该类提供了三种格式化方法：
+预定义的标准格式
+语言环境相关的格式
+自定义的格式
+时区的处理：
+Java8 中加入了对时区的支持，带时区的时间为分别为：
+ZonedDate、ZonedTime、ZonedDateTime
+其中每个时区都对应着ID，地区ID都为“{区域}/{城市}”的格式
+例如：Asia/Shanghai 等
+ZoneId：该类中包含了所有的时区信息
+getAvailableZoneIds() : 可以获取所有时区时区信息
+of(id) : 用指定的时区信息获取ZoneId 对象
+
+
+March 19：
+上线流程整理：
+命名规则：gqj_20180319_功能描述
+merge request git diff 到分支。
+审核过后relase版发布到线上
+
+要反复编译的 jar包命名用 0.2.3-SNAPSHOT
+
+上线文档 + 发邮件
+
+问题：
+@postContstruct -- BasePayGateV2Repository.java;
+BasePayGateV2Repository ---toPay?!!!

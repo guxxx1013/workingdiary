@@ -39,3 +39,8 @@ public class PayOrderQueryServiceImpl implements PayOrderQueryService {
 方法一：
 ApplicationContext context = new ClassPathXmlApplicationContext("classpath*:spring-config.xml");
 HelloWorld helloWorld = (HelloWorld) context.getBean("helloWorld");
+
+SpringMVC注解区别：
+@RequestMapping;
+@GetMapping = @RequestMapping(method = RequestMethod.GET);
+@PostMapping = @RequestMapping(method = RequestMethod.POST);

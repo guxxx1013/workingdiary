@@ -1,3 +1,115 @@
+需要记录的内容：
+2018-03-20 09:00:00 to 2018-03-20 09:59:59
+查到
+2018-03-19 09:00:00 to 2018-03-19 09:59:59
+
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+
+2.pay-cashier-web
+transcation:无
+Problem错误：无报错
+
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：无报错
+
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:无
+Problem错误：
+http://cat.owitho.com/cat/r/m/member-service-0a001f17-422628-2305?domain=pay-gate-service
+
+6.pay-gate-wx-serviceImpl:
+transcation:无
+Problem错误:
+老样子
+
+
+需要记录的内容：
+2018-03-19 10:00:00 to 2018-03-19 10:59:59
+查到
+2018-03-17 10:00:00 to 2018-03-17 10:59:59
+
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+
+2.pay-cashier-web
+transcation:无
+Problem错误：无报错
+
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：无报错
+
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:无
+Problem错误：无报错
+
+6.pay-gate-wx-serviceImpl:
+transcation:无
+Problem错误:
+老样子
+
+------------------------------------------------------------
+需要记录的内容：
+2018-03-17 13:00:00 to 2018-03-17 13:59:59
+查到
+2018-03-16 10:00:00 to 2018-03-16 10:59:59
+
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+
+2.pay-cashier-web
+transcation:无
+Problem错误：无报错
+
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：无报错
+
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:无
+Problem错误：无报错
+
+6.pay-gate-wx-serviceImpl:
+transcation:
+Problem错误：
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f4c-422571-376?domain=pay-gate-wx-service
+ok
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002469-422568-875?domain=pay-gate-wx-service
+ok
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f4c-422555-1249?domain=pay-gate-wx-service
+ok
+http://cat.owitho.com/cat/r/p?date=2018031618&ip=All&step=-1&op=view&domain=pay-gate-wx-service&ip=All&urlThreshold=1000&sqlThreshold=100&serviceThreshold=50&cacheThreshold=10&callThreshold=50
+ok
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002469-422552-3870?domain=pay-gate-wx-service
+ok
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002459-422551-3385?domain=pay-gate-wx-service
+ok
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002469-422550-1552?domain=pay-gate-wx-service
+ok
+
 
 需要记录的内容：
 2018-03-16 10:00:00 to 2018-03-16 10:59:59
@@ -39,6 +151,12 @@ http://cat.owitho.com/cat/r/m/pay-gate-service-0a002469-422526-485?domain=pay-ga
 http://cat.owitho.com/cat/r/m/pay-gate-service-0a002459-422525-2668?domain=pay-gate-wx-service
 http://cat.owitho.com/cat/r/m/pay-gate-service-0a002469-422524-1474?domain=pay-gate-wx-service
 ok
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002469-422548-4412?domain=pay-gate-wx-service
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f4c-422547-253?domain=pay-gate-wx-service
+ok
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002459-422546-154?domain=pay-gate-wx-service
+ok
+
 
 
 需要记录的内容：
@@ -48,7 +166,7 @@ ok
 
 1.pay-cashier-service
 transcation:无报错。
-Problem错误：
+Problem错误：(????)
 http://cat.owitho.com/cat/r/m/pay-cashier-web-0a001faa-422501-1176?domain=pay-cashier-service
 
 
