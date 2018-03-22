@@ -1,4 +1,65 @@
 需要记录的内容：
+2018-03-22 09:00:00 to 2018-03-22 09:59:59
+查到
+2018-03-21 09:00:00 to 2018-03-21 09:59:59
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+
+2.pay-cashier-web
+transcation:无
+Problem错误：无报错
+
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：无报错
+
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:无
+Problem错误：
+
+6.pay-gate-wx-service:
+transcation:无
+Problem错误:老样子
+
+需要记录的内容：
+2018-03-21 09:00:00 to 2018-03-21 09:59:59
+查到
+2018-03-20 09:00:00 to 2018-03-20 09:59:59
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+
+2.pay-cashier-web
+transcation:无
+Problem错误：无报错
+
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：无报错
+
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:无
+Problem错误：
+
+6.pay-gate-wx-serviceImpl:
+transcation:无
+Problem错误:无
+
+
+需要记录的内容：
 2018-03-20 09:00:00 to 2018-03-20 09:59:59
 查到
 2018-03-19 09:00:00 to 2018-03-19 09:59:59

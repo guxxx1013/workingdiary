@@ -982,4 +982,81 @@ merge request git diff 到分支。
 
 问题：
 @postContstruct -- BasePayGateV2Repository.java;
-BasePayGateV2Repository ---toPay?!!!
+BasePayGateV2Repository ---toPay结束。
+
+AppAliPayCallBackController.Java
+对方来调我们/paycore/appAliPayCallBack 验证好回写支付宝。
+支付宝同时给我们request 和 reponse reponse给我们回写，request给我们我们需要的参数
+
+
+CreateOrderModule.Java
+怎么做到一对多的。
+context；
+
+payOrderService--老的流程，只是为了老表双写，新的流程需要双写，老的流程也需要双写。
+
+支付中心流程
+业务方
+点完确认支付后，都走完了，就等回调。
+
+pay-gate-service 创支付单 做策略的分发
+pay-gate-alipay-service 我们在第三方创预付单，把我们这笔订单的信息都给第三方，
+但是订单还是待支付状态，这时候第三方调用我们的接口并返回我们一些参数(一些参数是我们拿的)，我们把这些参数
+给到前端，前端就会把那个页面换起来。我们事情这里已经做完了。处理完后回调我们。然后我们把回调的东西给业务方就行了。
+
+（早上13：10）
+第三方回调我们，我们拿到支付结果，更新我们数据的更新，更新完通过mq给到业务方同步支付状态。
+
+
+
+
+问题：
+
+pay-cashier:
+callbackserviceimpl
+
+payOrderNewRepository
+payOrderOperateRepository 有区别吗？ 重写两遍？？？
+4个controller再确定一下
+
+PayGateController--在点的一刹那进行调用。就可以选了。代码56行。
+
+任务：
+写一个controller 服务查询， 通过预付单的prepay_order_no 查出对应的biz_id和biz_type 和查出对应的pay_order_no
+
+Maven红字处理：
+cd /Users/quanjugu/.m2/repository
+cd lingshou/
+rm -rf pay-cashier-api/     移除
+
+提交maven过程
+clean   ----->   install   ------> deploy
+
+git创建分支：
+点进去 --->创建分支 --->命名---->提交
+先下载再切分支
+
+任务三：开发一个Spring MVC类似的小程序通过给定的pre_pay_No来获得biz_type 和 biz_order_id
+并且根据pre_pay_No取到对应的payorder内的信息（多条），一对多条内容。
+
+思路：
+1.创建BizQueryReq(入参使用，成员变量prepayNo(g,s));
+  创建BizQueyResp(出参使用，成员变量BizDetailDTO(g,s)自定义DTO类型表格)；
+  并创建bizDetailDTO.java表格（需要拿到的参数）;
+2.创建BizOrderQueryService接口（方法queryBizDetail你需要赋值到DTO表格的方法）;
+3.创建BizOrderQueryServiceImpl类（实现根据入参取得表数据，得到需要PrepayOrderPO,转成bizDetailDTO）；
+4.创建BizOrderQueryRepository.java（提供需要得到上述对应表格的方法，需要定义Mybatis对应方法已便连接数据库）；
+5.创建BizPrepayOrderReadMapper接口(定义mapper方法，和对应参数param的对象)。
+6.创建BizPrepayOrderReadMapper.xml(定义mysql方法)。
+
+到web页面定义controller，以便在网页上可以调用；
+1.创建@RequestMapping 链接
+2.定义返回Josn Map类型数据（@ResponseBody）
+3.调用service 层中接口。导入prepayNO数据(@PathVariable)
+4.如图上取得对应DTO表，定义ResponseUtil类生成对应Map
+5.取得Map数据并返回。
+
+
+问题：配置spring？peigon?
+为何不用resultMap结果也可以对应。
+query黑屏问题
