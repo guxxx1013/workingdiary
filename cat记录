@@ -1,4 +1,113 @@
 需要记录的内容：
+2018-03-26 09:00:00 to 2018-03-24 09:59:59
+查到
+2018-03-24 09:00:00 to 2018-03-23 09:59:59
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+
+2.pay-cashier-web
+transcation:无
+Problem错误：无报错
+
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：无报错
+
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:无
+Problem错误：
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002469-422767-853?domain=pay-gate-service
+
+
+6.pay-gate-wx-service:
+transcation:无
+Problem错误:老样子
+
+需要记录的内容：
+2018-03-24 09:00:00 to 2018-03-24 09:59:59
+查到
+2018-03-23 09:00:00 to 2018-03-23 09:59:59
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+
+2.pay-cashier-web
+transcation:无
+Problem错误：无报错
+
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：无报错
+
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:无
+Problem错误：
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002459-422721-1697?domain=pay-gate-service
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002459-422715-126?domain=pay-gate-service
+
+6.pay-gate-wx-service:
+transcation:无
+Problem错误:老样子
+
+
+需要记录的内容：
+2018-03-23 09:00:00 to 2018-03-23 09:59:59
+查到
+2018-03-22 09:00:00 to 2018-03-22 09:59:59
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+
+2.pay-cashier-web
+transcation:无
+Problem错误：无报错
+
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：无报错
+
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:
+Problem错误：
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002459-422712-3060?domain=pay-gate-service
+根据错误码：116022 到程序内查到是cashier_wx_openId_err， 因为是微信支付，定位pay-gate-wx-service;
+在定位payMiniProgramWXGateService--->payMiniProgramWXGateServiceImpl---->57行。------>到
+数据库差不多useip useid prepayno是因为数据库里没存信息？还是因为已成功被删掉了数据？
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002459-422699-12142?domain=pay-gate-service
+这种错误是第三方的吗超时；
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002459-422700-17?domain=pay-gate-service
+
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002459-422695-34?domain=pay-gate-service
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f33-422694-3233?domain=pay-gate-service
+
+6.pay-gate-wx-service:
+transcation:无
+Problem错误:老样子
+org.apache.http.NoHttpResponseException
+
+
+
+
+需要记录的内容：
 2018-03-22 09:00:00 to 2018-03-22 09:59:59
 查到
 2018-03-21 09:00:00 to 2018-03-21 09:59:59

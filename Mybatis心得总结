@@ -117,3 +117,7 @@ http://blog.csdn.net/xu1916659422/article/details/77921912
   <select id="queryByPayOrderIdAndPayToken" parameterType="map" resultType="com.lingshou.pay.cashier.po.PayTokenPO">
   为什么是map？可以传map数据到里面。
   parameterType为入参类型。 resultType为出参类型。
+
+
+  如何返回List类型数据和如何定义resultMap类型
+  https://www.cnblogs.com/panxuejun/p/5851622.html

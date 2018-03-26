@@ -1045,6 +1045,7 @@ git创建分支：
   并创建bizDetailDTO.java表格（需要拿到的参数）;
 2.创建BizOrderQueryService接口（方法queryBizDetail你需要赋值到DTO表格的方法）;
 3.创建BizOrderQueryServiceImpl类（实现根据入参取得表数据，得到需要PrepayOrderPO,转成bizDetailDTO）；
+此处要进行Spring配置 appcontext-server.xml(pigeon).
 4.创建BizOrderQueryRepository.java（提供需要得到上述对应表格的方法，需要定义Mybatis对应方法已便连接数据库）；
 5.创建BizPrepayOrderReadMapper接口(定义mapper方法，和对应参数param的对象)。
 6.创建BizPrepayOrderReadMapper.xml(定义mysql方法)。
@@ -1053,10 +1054,34 @@ git创建分支：
 1.创建@RequestMapping 链接
 2.定义返回Josn Map类型数据（@ResponseBody）
 3.调用service 层中接口。导入prepayNO数据(@PathVariable)
+此处一样要进行spring或许配置 appcontext-client.xml(pigeon到pigeon上获取)
 4.如图上取得对应DTO表，定义ResponseUtil类生成对应Map
 5.取得Map数据并返回。
 
 
-问题：配置spring？peigon?
+问题：配置spring？peigon?(done!!!)
+可以进行任意配置不影响
 为何不用resultMap结果也可以对应。
+因为在mybatis-configuration.xml文件中已配置 <setting name="mapUnderscoreToCamelCase" value="true"/>
+所以可以自动去除下划线然后匹配上
 query黑屏问题
+
+上线流程：
+1.先到gitlab上提交merge request， 然后等组长或者德龙哥审核通过
+2.来到http://jenkins.intra.im/job/prod-pay-gate-service/ 点构建
+构建的主要目的是为了看能否编译通过，然后到lion上面配置需要配的参数。
+3.如果有脚本程序需提前一天和组长说让他泡一下
+4.构建配置完成以后，到http://rundeck.intra.im
+找到配置的机子点run it now
+5.上cat 找到对应机号看。
+
+删除文件
+rm -rf *.iml
+rm -rf .idea
+
+上周：熟悉上线
+
+2.熟悉git协作分支策略，会使用常用命令；
+3.熟悉支付中心各应用模块的用途以及之间的调用关系
+5.熟悉编码, 上线流程；
+6.做任务

@@ -44,3 +44,7 @@ SpringMVC注解区别：
 @RequestMapping;
 @GetMapping = @RequestMapping(method = RequestMethod.GET);
 @PostMapping = @RequestMapping(method = RequestMethod.POST);
+
+从前端传值到后端：
+@RequestMapping("/paycore/biz/{prepayNo}/testorder.do")
+public String cancelAuditThisOrder(@PathVariable("prepayNo") String strOrderID)
