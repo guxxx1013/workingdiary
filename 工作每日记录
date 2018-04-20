@@ -598,7 +598,6 @@ zebra：------>Mybatis 封了一层 可控 查询可以异步(没用) 分库。
 主库---只用来写， 从库只用来读 dao层， GroupDataSource---读，写
 
 lion：业务平台， zookip 用于配置参数，api提供， 不需要重启系统就可以完成编译。
-
 cat（平台监控）：service 被调用了多少次，日志，业务大盘---曲线图problem出现在哪里。（黑线前天，蓝色今天）轮询 ，访问量比较
 是否正常.
 主动配置 transcation 默认， 发布一坟台机器（尤其是自己改过的代码，至少隔5分钟再发另一台）。
@@ -1068,12 +1067,24 @@ query黑屏问题
 
 上线流程：
 1.先到gitlab上提交merge request， 然后等组长或者德龙哥审核通过
-2.来到http://jenkins.intra.im/job/prod-pay-gate-service/ 点构建
-构建的主要目的是为了看能否编译通过，然后到lion上面配置需要配的参数。
+2.http://jenkins.intra.im/job/prod-pay-gate-service/ 来到先点配置检查版本是否为release。
+点构建
+点击下方版本是否为最新的
+构建的主要目的是为了看能否编译通过，然后到lion上面配置需要配的参数。(或在二前面)
 3.如果有脚本程序需提前一天和组长说让他泡一下
 4.构建配置完成以后，到http://rundeck.intra.im
-找到配置的机子点run it now
-5.上cat 找到对应机号看。
+pay-cashier-service
+prod-paychashier-web
+找到配置的机子点run Job now / update
+5.上cat 找到对应机号看。Problem / Event/ transcation
+pay-cashier-service ---> 查看pigeon service order query 修改的接口
+prod-paycashier-web     ---> paycore/gate
+
+
+测试的话，用下面的
+二：online环境测试账号
+
+用支付宝和微信界面测试
 
 删除文件
 rm -rf *.iml
@@ -1085,3 +1096,243 @@ rm -rf .idea
 3.熟悉支付中心各应用模块的用途以及之间的调用关系
 5.熟悉编码, 上线流程；
 6.做任务
+
+改beta
+<bean id="lion" class="com.lingshou.lion.client.InitializeConfig"/>
+
+   <bean id="ssoServiceUrl" class="java.lang.String">
+       <constructor-arg value="http://localhost:8082/"/>
+   </bean>
+
+   <bean id="ssoServiceWelcomeUrl" class="java.lang.String">
+       <constructor-arg value="http://localhost:8082/"/>
+   </bean>
+
+
+编程代码问题整理：
+1.PayModeQueryResp.java uid? payModeDetailDTO.java UID?
+2.PayModeQueryResp? 复用payGateResultCode
+3.xml name关键字问题。
+4.status = '0' 确认一下。
+5.now()问题。
+6.beanutils自动找命名一样的？Respository
+
+7.PayModeDetailRepository.java 再思考一下runtimeException.
+8.PayModeDetailServiceImpl Cat配置 后配
+
+9哪一层处理createby createtime等数据
+10.<!--create_time =#{createTime},--> 被我删了，在插数据的时候
+
+!!!!!!paymodepo 里面多了一个type？ sql文件是否还可以用？？
+!!!!!!版本号问题！！！！！
+
+11.insert 删除createby 和updateby
+
+测试问题：
+进入
+http://localhost:4080/services进行测试
+http://172.19.24.117:4080/services
+
+或者进入（不确定）
+先发布到分支上
+http://rundeck.intra.im
+然后找
+
+
+
+{"payModeDetailDTO":{""}}
+测试代码：payMode
+改：{"payModeManageDTO":{"id":12,"channel":44,"method":55,"name":"anglebaby","description":"weixin","status":1,"enabled":1}}
+增：{"payModeManageDTO":{"channel":25,"method":32,"name":"anglebaby","description":"weixin","status":1,"enabled":1}}
+
+测试代码：payModeConfig:
+增：{"payModeManageConfigDTO":{"platform":25,"payModeId":32,"type":"1","sequence":"3","status":1}}
+改：{"payModeManageConfigDTO":{"id":14,"platform":28,"payModeId":36,"type":"1","sequence":"3","status":1}}
+
+测试代码：payModeBizConfig:
+增：{"payModeManageBizConfigDTO":{"bizType":23,"payModeIds":"[1]","excludeModeIds":"[2]","isNeedConfirm":0,"serviceUrl":"http://service.owitho.com/welfare/welfare/rackOrderPayQueryService_1.0.0","status":1}}
+改：{"payModeManageBizConfigDTO":{"id":4,"bizType":24,"payModeIds":"[2]","excludeModeIds":"[1]","isNeedConfirm":0,"serviceUrl":"http://service.owitho.com/welfare/rackOrderPayQueryService_1.0.0","status":1}}
+
+
+
+
+
+
+UPDATE LS_Pct_Paymode
+    SET channel = 13,
+    method = 32,
+    name = "name",
+    description = "11",
+    status =1,
+    enabled =1,
+    update_time = now()
+    WHERE id = 11;
+
+    UPDATE LS_pct_paymode SET channel = 99 WHERE id= 12;
+
+前端：
+前端框架
+vue // element ui
+前端构建：
+webpack
+
+前端工程化
+local<--->gitlab----->jenkins----->static<---->CDN
+                            ----->static path
+ws
+
+html ftl
+
+webpack config.js 关注entry
+
+git checkout master/release 切到master
+git checkout -b demo-0330
+
+npm run build
+
+modules vue中引element ui中的内容
+
+extension 装vue插件
+
+python -m SimpleHTTPServer 连接代理服务器
+
+前端学习：
+
+1..html 只需要修改.js, id 引用
+
+Prototype：用来显示已编辑网页
+Pages ：用来命名
+Modules：连接后端js，具体页面实施
+
+
+支付方式总结：
+无法使用暂时：4
+
+使用方式1，5
+1、5测试方法，进入猩便利app，然后点充值有礼，选择金额，选择付款方式
+对应的就是第1和第5折两种方法。
+
+5支付宝网站支付；
+支付宝app扫码支付，苹果手机不行，必须安卓手机沙箱版才可以支付
+
+无法使用暂时：7
+7余额支付。任意扫码充值选择，暂时无法充值。
+
+暂时无法使用：8、9
+特殊支付方式一栏。
+
+2.微信扫码
+10.微信小程序（我没有授权，所以直接是第2种，不是第10种）
+加完权限后就是第10种不是第2种。
+
+3、6
+微信-app 支付宝-app
+通过猩便利扫码进入然后选择商品支付
+
+沙箱支付宝
+
+oos项目：
+
+配置pay-oss-web中的ftl文件，然后把
+src="http://localhost:8000/dist/static/manifest.js"
+
+调试dist目录
+http://localhost:8000/dist/
+
+然后去写
+
+去除已经在运行的oss进程：
+ps -ef|grep python
+kill -9 1462
+
+
+popover弹出框
+
+div布局，
+如何更好地调试，
+如何查看语法
+前端数据保存周期？传输后端？
+console控制台用法？
+http post get
+
+
+<div>
+  <div>
+  </div>
+</div>
+
+
+盒子模型
+
+
+1.同样微信支付 app进入 猩便利app进入 不一样？
+微信中打开商户的H5页面，商户在H5页面通过调用微信支付提供的JSAPI接口调起微信支付模块来完成支付，
+适用于在公众号、朋友圈、聊天窗口等微信内完成支付的场景。
+
+APP支付是指商户通过在移动端应用APP中集成开放SDK调起微信支付模块来完成支付。
+
+2.不同数据交互。 时序图 数据流图 （支付状态图。。。。。。。。。）
+业务方（前端，后端） 支付中心（前端，后端） 第三方（前端，端）
+3.为什么分三大类。pay-gate-alipay-service， pay-gate-wx-services   pay-gate-common-service
+4.作业： 两笔支付单都成功，只有一个预付单情况，怎么出现的，我们怎么办？
+
+5.为什么要这么写?
+统一收银台接入
+https://wiki.owitho.com/pages/viewpage.action?pageId=7984670
+收银台后端对接接口
+https://wiki.owitho.com/pages/viewpage.action?pageId=7984678
+
+6作业 怎么用，为什么用 appid代码 --我们怎么用
+
+mqbiztag
+mqpaynotifybizrespository
+
+标记
+
+调用beta环境地址：
+http://paycenter.owitho.intra.im/payModeManage/mainpage
+
+web工程调试：
+beta-pay-oss-web jenkins 和 rundeck
+app-pay-center 只需要在 jenkins 上发布
+
+上：前端代码优化， 下午，beta上线修改完后端程序上线， 然后修改前端不符合要求的部分，晚上，完成修改beta
+环境下上线。
+
+
+前端左侧 去除查询 新增和删除用两个表数据
+
+
+
+把需要新做的页面，整理设计了一下，定义好了三个工程每个工程的内容，后端接口定义，
+传参内容等，
+
+新业务加入来， 如何不用改代码。
+
+SELECT ls_pct_prepayorder.prepay_order_no AS apple, ls_pct_payorder.pay_order_no as banana FROM ls_pct_prepayorder INNER JOIN ls_pct_payorder
+ON ls_pct_prepayorder.prepay_order_no = ls_pct_payorder.prepay_order_no;
+
+
+
+
+gitlab
+先commit push 完本地分支代码， 然后切换到需要merge的主分支代码中， 选择远程我的代码， 点击merge。
+然后解决冲突。解决完后再push上去。然后修改部分deploy到maven仓库
+
+页面打断点：
+Sources 左边 localhost：8000  ==> payData.js
+
+
+
+
+if (this.selectedValue == 'prepayOrderNo') {
+                const queryUrl = 'prepayOrderNo=' + this.dataNo;
+                ajaxMonitor.getPayDataByPrepayOrderNo(queryUrl).then((res) => {
+                    if (res.code == 200) {
+                        $message.success('查询支付信息成功');
+                        this.searchList = res.data;
+                    } else {
+                        $message.error('出现错误，查询支付信息失败');
+                    }
+                })
+            }

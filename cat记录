@@ -1,4 +1,466 @@
 需要记录的内容：
+2018-04-20 09:00:00 to 2018-04-17 09:59:59
+查到
+2018-04-19 09:00:00 to 2018-04-16 09:59:59
+1.pay-cashier-service
+http://cat.owitho.com/cat/r/m/pay-cashier-web-0a001eaf-423374-2278?domain=pay-cashier-service
+和昨天一样，数据缺失，无法更新。
+2.pay-cashier-web
+
+3.pay-gate-alipay-service
+
+4.pay-gate-common-service
+
+5.pay-gate-service:
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002459-423373-430?domain=pay-gate-service
+116025类错误
+6.pay-gate-wx-service:
+
+
+
+需要记录的内容：
+2018-04-19 09:00:00 to 2018-04-17 09:59:59
+查到
+2018-04-18 09:00:00 to 2018-04-16 09:59:59
+1.pay-cashier-service
+http://cat.owitho.com/cat/r/m/pay-cashier-web-0a001faa-423362-155?domain=pay-cashier-service
+代码定位：
+public boolean updatePayOrder(String payOrderNo, String thirdPartOrderId, int startPayStatus, int endPayStatus, Date payTime){
+       int result = payOrderNewMapper.updatePayStatusAndPayTime(payOrderNo, thirdPartOrderId, startPayStatus, endPayStatus, payTime);
+       if (result != 1) {
+           String msg = "error,update pay status and pay time, payOrderNo: " + payOrderNo;
+           throw new RuntimeException(msg);
+       }
+       return true;
+   }
+}
+分析：可能是输入格式不对，然后找不到。无法update数据
+
+
+http://cat.owitho.com/cat/r/m/pay-cashier-web-0a001eae-423349-14543?domain=pay-cashier-service
+代码定位：
+private Boolean isSign(Integer contractType,Integer userId){
+       ContractQueryReq contractQueryReq=new ContractQueryReq();
+       contractQueryReq.setContractType(contractType);
+       AccountUnionDto accountUnionDt=accountService.queryUnionAccountByUserId(userId);
+       contractQueryReq.setUserId(accountUnionDt.getUnionId());
+       ContractQueryResp resp=contractQueryService.queryContractPo(contractQueryReq);
+       if(!resp.isSuccess() ){
+           return false;
+       }
+}
+分析： AccountUnionDto accountUnionDt=accountService.queryUnionAccountByUserId(userId)
+userId 找不到，accountUnionDt为null， 跳入null pointer exception
+
+2.pay-cashier-web
+
+3.pay-gate-alipay-service
+
+4.pay-gate-common-service
+
+5.pay-gate-service:
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002469-423340-2052?domain=pay-gate-service
+//116022
+
+6.pay-gate-wx-service:
+
+
+需要记录的内容：
+2018-04-17 09:00:00 to 2018-04-17 09:59:59
+查到
+2018-04-16 09:00:00 to 2018-04-16 09:59:59
+1.pay-cashier-service
+
+2.pay-cashier-web
+
+3.pay-gate-alipay-service
+
+4.pay-gate-common-service
+
+5.pay-gate-service:
+
+6.pay-gate-wx-service:
+
+
+
+
+需要记录的内容：
+2018-04-16 09:00:00 to 2018-04-16 09:59:59
+查到
+2018-04-14 09:00:00 to 2018-04-14 09:59:59
+1.pay-cashier-service
+
+2.pay-cashier-web
+
+3.pay-gate-alipay-service
+
+4.pay-gate-common-service
+
+5.pay-gate-service:
+
+6.pay-gate-wx-service:
+
+完成整体
+
+开始web层系统编写
+需要记录的内容：
+2018-04-14 09:00:00 to 2018-04-11 09:59:59
+查到
+2018-04-13 09:00:00 to 2018-04-10 09:59:59
+1.pay-cashier-service
+http://cat.owitho.com/cat/r/p?date=2018041321&ip=All&step=-1&op=view&domain=pay-cashier-service&ip=All&urlThreshold=1000&sqlThreshold=100&serviceThreshold=50&cacheThreshold=10&callThreshold=50
+plamform:1100   X8
+其他一切正常
+
+2.pay-cashier-web
+
+3.pay-gate-alipay-service
+
+4.pay-gate-common-service
+
+5.pay-gate-service:
+
+6.pay-gate-wx-service:
+
+代码定位：
+116016参数错误。找到哪里的参数输入出现错误。
+
+第三方上线程序错误。导致PayNewBizPlatformCode 里
+kylin_weixin("1001", "微信"),
+kylin_alipay("1002", "支付宝"),
+kylin_app("1003", "猩便利APP"),
+kylin_terminal("1004", "智能终端"),
+kylin_ftown("1005", "方糖小镇"),
+kylin_miniProgram("1006", "小程序"),
+kylin_pc("1007", "pc"),
+kylin_other("1100", "其它");
+没找到对应跳转，只能跳到1100，出现错误
+
+
+需要记录的内容：
+2018-04-13 09:00:00 to 2018-04-11 09:59:59
+查到
+2018-04-12 09:00:00 to 2018-04-10 09:59:59
+1.pay-cashier-service
+
+2.pay-cashier-web
+无报错
+
+3.pay-gate-alipay-service
+
+4.pay-gate-common-service
+无报错
+
+5.pay-gate-service:
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f33-423207-191?domain=pay-gate-service
+116022老问题。其他一切正常
+
+6.pay-gate-wx-service:
+
+
+
+需要记录的内容：
+2018-04-12 09:00:00 to 2018-04-11 09:59:59
+查到
+2018-04-11 09:00:00 to 2018-04-10 09:59:59
+1.pay-cashier-service
+
+2.pay-cashier-web
+无报错
+
+3.pay-gate-alipay-service
+
+4.pay-gate-common-service
+无报错
+
+5.pay-gate-service:
+
+6.pay-gate-wx-service:
+
+
+
+
+
+
+需要记录的内容：
+2018-04-11 09:00:00 to 2018-04-11 09:59:59
+查到
+2018-04-10 09:00:00 to 2018-04-10 09:59:59
+
+4月11日
+1.pay-cashier-service
+http://cat.owitho.com/cat/r/m/pay-cashier-service-0a001ef8-423156-154?domain=pay-cashier-service
+http://cat.owitho.com/cat/r/m/pay-cashier-web-0a001eaf-423154-16624?domain=pay-cashier-service
+
+错误分析： 昨天听你们讨论过，应该是mq出现问题导致“com.alibaba.rocketmq.client.exception”
+2.pay-cashier-web
+无报错
+
+3.pay-gate-alipay-service
+
+4.pay-gate-common-service
+无报错
+
+5.pay-gate-service:
+
+6.pay-gate-wx-service:
+
+
+需要记录的内容：
+2018-04-10 09:00:00 to 2018-04-03 09:59:59
+查到
+2018-04-09 09:00:00 to 2018-04-02 09:59:59
+
+1.pay-cashier-service
+http://cat.owitho.com/cat/r/m/store-order-service-0a001dff-423127-951?domain=pay-cashier-service
+
+2.pay-cashier-web
+无报错
+
+3.pay-gate-alipay-service
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f4c-423128-2604?domain=pay-gate-alipay-service
+
+
+4.pay-gate-common-service
+无报错
+
+5.pay-gate-service:
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f4c-423145-1659?domain=pay-gate-service
+116022
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f4c-423128-2603?domain=pay-gate-service
+116025
+6.pay-gate-wx-service:
+无报错
+
+错误分析：
+错误1：昨天听你和组长讨论过是微信服务挂了
+错误3和5中的116025是一起的，response.isSucess没拿到，不是我们的问题
+116022问题是老问题。
+
+REQUEST={"needEncrypt":false,
+"apiVersion":"1.0",
+"apiMethodName":"alipay.trade.create",
+"responseClass":"com.alipay.api.response.AlipayTradeCreateResponse",
+"textParams":{"biz_content":"{\"buyer_id\":\"2088802852674075\",\"out_trade_no\":\"20180409165007XBL0000000F4OBBPC\",\"subject\":\"猩便利-商品支付\",\"timeout_express\":\"30m\",\"total_amount\":17.8}"},"bizContent":"{\"buyer_id\":\"2088802852674075\",\"out_trade_no\":\"20180409165007XBL0000000F4OBBPC\",\"subject\":\"猩便利-商品支付\",\"timeout_express\":\"30m\",\"total_amount\":17.8}",
+"notifyUrl":"http://www.xingbianli.com/paycore/mAliPayCallBack"}&
+RESPONSE={"body":"{\"alipay_trade_create_response\":{\"code\":\"20000\",\"msg\":\"Service Currently Unavailable\",\"sub_code\":\"aop.ACQ.SYSTEM_ERROR\",\"sub_msg\":\"系统异常\"},\"sign\":\"BcfBol98pwQ3iyLhG81SkAAUooRpB1xWYHYc1IoJn6zANc+ki5jjRJSjwGfrmQHZo1xApnYGsy6n6gTx8NuLxlMwO87+T/ES3sExKvt3mbW2Ta4Jcp/jjqFy1E75vFvG+j62zxJslXu9TGg1jSU3KoO1EbIDKXk7OhI6hFi0IkrkQGb1nE/KvAW6H5RsPD8mMy2jUPu+jmbEBQAUreIqQg0NBKOdiWHxQjm9qnNy+jpHQuxxmyvAQ4o3rnD5GluJf8xJ5O1Uh3EA0wwOia6iANey3zy9M1uwBi/2GqG/9TTtiMgqcGahzAmNtRkm09HEuXf5PmCguMjtkvlKZm6qYg==\"}","code":"20000","errorCode":"20000","msg":"Service Currently Unavailable",
+"params":{"biz_content":"{\"buyer_id\":\"2088802852674075\",\"out_trade_no\":\"20180409165007XBL0000000F4OBBPC\",\"subject\":\"猩便利-商品支付\",\"timeout_express\":\"30m\",\"total_amount\":17.8}"},"subCode":"aop.ACQ.SYSTEM_ERROR","subMsg":"系统异常","success":false}
+
+
+需要记录的内容：
+2018-04-08 09:00:00 to 2018-04-03 09:59:59
+查到
+2018-04-07 09:00:00 to 2018-04-02 09:59:59
+1.pay-cashier-service
+无报错
+
+2.pay-cashier-web
+无报错
+
+3.pay-gate-alipay-service
+无报错
+
+4.pay-gate-common-service
+无报错
+
+5.pay-gate-service:
+http://cat.owitho.com/cat/r/p?date=2018040715&ip=All&step=1&op=view&domain=pay-gate-service&ip=All&urlThreshold=1000&sqlThreshold=100&serviceThreshold=50&cacheThreshold=10&callThreshold=50
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002469-423075-326?domain=pay-gate-service
+
+
+6.pay-gate-wx-service:
+无报错
+
+需要记录的内容：
+2018-04-03 09:00:00 to 2018-04-03 09:59:59
+查到
+2018-04-02 09:00:00 to 2018-04-02 09:59:59
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+2.pay-cashier-web
+transcation:无
+Problem错误：
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：
+
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:无
+Problem错误：
+
+6.pay-gate-wx-service:
+transcation:无
+Problem错误:老样子
+
+需要记录的内容：
+2018-04-02 09:00:00 to 2018-03-30 09:59:59
+查到
+2018-03-31 09:00:00 to 2018-03-31 09:59:59
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+2.pay-cashier-web
+transcation:无
+Problem错误：
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：
+
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:无
+Problem错误：
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f4c-422953-830?domain=pay-gate-service
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002459-422901-108?domain=pay-gate-service
+
+6.pay-gate-wx-service:
+transcation:无
+Problem错误:老样子
+
+
+
+需要记录的内容：
+2018-03-30 09:00:00 to 2018-03-30 09:59:59
+查到
+2018-03-29 09:00:00 to 2018-03-29 09:59:59
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+2.pay-cashier-web
+transcation:无
+Problem错误：
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：
+
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:无
+Problem错误：
+
+6.pay-gate-wx-service:
+transcation:无
+Problem错误:老样子
+
+
+
+需要记录的内容：
+2018-03-29 09:00:00 to 2018-03-29 09:59:59
+查到
+2018-03-28 09:00:00 to 2018-03-28 09:59:59
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+2.pay-cashier-web
+transcation:无
+Problem错误：
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f4c-422840-3272?domain=pay-gate-alipay-service
+REQUEST={"needEncrypt":false,"apiVersion":"1.0","apiMethodName":"alipay.trade.create","responseClass":"com.alipay.api.response.AlipayTradeCreateResponse","textParams":{"biz_content":"{\"buyer_id\":\"2088212121191967\",\"out_trade_no\":\"20180328164659XBL0000000EYIFV9X\",\"subject\":\"猩便利-商品支付\",\"timeout_express\":\"30m\",\"total_amount\":2.4}"},"bizContent":"{\"buyer_id\":\"2088212121191967\",\"out_trade_no\":\"20180328164659XBL0000000EYIFV9X\",\"subject\":\"猩便利-商品支付\",\"timeout_express\":\"30m\",\"total_amount\":2.4}","notifyUrl":"http://www.xingbianli.com/paycore/mAliPayCallBack"}&
+
+
+RESPONSE={"body":"{\"alipay_trade_create_response\":{\"code\":\"20000\",\"msg\":\"Service Currently Unavailable\",\"sub_code\":\"aop.ACQ.SYSTEM_ERROR\",\"sub_msg\":\"系统异常\"},\"sign\":\"BcfBol98pwQ3iyLhG81SkAAUooRpB1xWYHYc1IoJn6zANc+ki5jjRJSjwGfrmQHZo1xApnYGsy6n6gTx8NuLxlMwO87+T/ES3sExKvt3mbW2Ta4Jcp/jjqFy1E75vFvG+j62zxJslXu9TGg1jSU3KoO1EbIDKXk7OhI6hFi0IkrkQGb1nE/KvAW6H5RsPD8mMy2jUPu+jmbEBQAUreIqQg0NBKOdiWHxQjm9qnNy+jpHQuxxmyvAQ4o3rnD5GluJf8xJ5O1Uh3EA0wwOia6iANey3zy9M1uwBi/2GqG/9TTtiMgqcGahzAmNtRkm09HEuXf5PmCguMjtkvlKZm6qYg==\"}","code":"20000","errorCode":"20000","msg":"Service Currently Unavailable","params":{"biz_content":"{\"buyer_id\":\"2088212121191967\",\"out_trade_no\":\"20180328164659XBL0000000EYIFV9X\",\"subject\":\"猩便利-商品支付\",\"timeout_express\":\"30m\",\"total_amount\":2.4}"},"subCode":"aop.ACQ.SYSTEM_ERROR","subMsg":"系统异常","success":false
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:无
+Problem错误：
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f4c-422840-3267?domain=pay-gate-service
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002469-422837-949?domain=pay-gate-service
+
+6.pay-gate-wx-service:
+transcation:无
+Problem错误:老样子
+
+
+需要记录的内容：
+2018-03-28 09:00:00 to 2018-03-24 09:59:59
+查到
+2018-03-27 09:00:00 to 2018-03-23 09:59:59
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+2.pay-cashier-web
+transcation:无
+Problem错误：
+http://cat.owitho.com/cat/r/m/pay-cashier-web-0a001fab-422820-147?domain=pay-cashier-web
+http://cat.owitho.com/cat/r/m/pay-cashier-web-0a001faa-422820-130?domain=pay-cashier-web
+
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：
+
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:无
+Problem错误：
+
+6.pay-gate-wx-service:
+transcation:无
+Problem错误:老样子
+
+需要记录的内容：
+2018-03-27 09:00:00 to 2018-03-24 09:59:59
+查到
+2018-03-26 09:00:00 to 2018-03-23 09:59:59
+1.pay-cashier-service
+transcation:无
+Problem错误：无报错
+
+
+2.pay-cashier-web
+transcation:无
+Problem错误：无报错
+
+
+3.pay-gate-alipay-service
+transcation:。无
+Problem错误：
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a002469-422792-1513?domain=pay-gate-alipay-service
+
+4.pay-gate-common-service
+transcation:无
+Problem错误：无报错
+
+5.pay-gate-service:
+transcation:无
+Problem错误：
+
+6.pay-gate-wx-service:
+transcation:无
+Problem错误:老样子
+
+
+
+需要记录的内容：
 2018-03-26 09:00:00 to 2018-03-24 09:59:59
 查到
 2018-03-24 09:00:00 to 2018-03-23 09:59:59

@@ -48,3 +48,10 @@ SpringMVC注解区别：
 从前端传值到后端：
 @RequestMapping("/paycore/biz/{prepayNo}/testorder.do")
 public String cancelAuditThisOrder(@PathVariable("prepayNo") String strOrderID)
+
+
+SpringMVC:
+<bean class = "org.springframwork.web.servlet.view.InternalResourceViewResolver">
+   <property name = "prefix" value = "/WEB-INF/pages/"></property>
+   <property name = "suffix" value =".jsp"></property>
+</bean>

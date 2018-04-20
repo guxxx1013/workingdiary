@@ -186,3 +186,21 @@ public interface UserMapper {
 并完成所需要用的bean注入。
 
 4.外面封一层，防止被直接浏览
+
+
+第五周：
+在现有的程序里实现 对于PayMode,PayMode Config 和 PayMode Biz Config 三表的增删改查功能。
+代码结构：
+1.PayModeManageDTO -->中间通讯表，用于沟通PO 和 VO 的中间表
+2.PayModeManageOperationReq（查询与这个分开） --> web工程约定好的输入封装格式
+3.PayModeManageOperationResp(查询与这个分开) --> web工程约定好的返回给他们的参数封装格式
+4.PayModeManageService -->  定义接口 确定入参出参
+----------------------------------api项目层--------------------------------
+
+5.PayModeManageServiceImpl --> 需要用xml Spring配置方式 进行注入。进行简单逻辑组装 完成接口任务
+6.PayModeManageRepository --> 和mapper层进行直接联系的数据通讯层 实现想要取得数据类型的方法层
+7.PayModeManageMapper.Java -->定义接口 mapper各类具体实现（crud）
+---------------------------------services Src 层---------------------------
+Mybatis配置文件
+8.PayModeManageMapper.xml --> 对应PayModeManageMapper.java的具体实现
+9.appcontext-server.xml  对应第5 spring配置文件
