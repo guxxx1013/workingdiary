@@ -1,4 +1,20 @@
 需要记录的内容：
+2018-04-23 09:00:00 to 2018-04-23 09:59:59
+查到
+2018-04-21 09:00:00 to 2018-04-21 09:59:59
+1.pay-cashier-service
+
+2.pay-cashier-web
+
+3.pay-gate-alipay-service
+
+4.pay-gate-common-service
+
+5.pay-gate-service:
+
+6.pay-gate-wx-service:
+
+需要记录的内容：
 2018-04-20 09:00:00 to 2018-04-17 09:59:59
 查到
 2018-04-19 09:00:00 to 2018-04-16 09:59:59
@@ -14,6 +30,9 @@ http://cat.owitho.com/cat/r/m/pay-cashier-web-0a001eaf-423374-2278?domain=pay-ca
 5.pay-gate-service:
 http://cat.owitho.com/cat/r/m/pay-gate-service-0a002459-423373-430?domain=pay-gate-service
 116025类错误
+http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f33-423368-2544?domain=pay-gate-service
+116022类错误
+cat一切正常，都是老错误
 6.pay-gate-wx-service:
 
 

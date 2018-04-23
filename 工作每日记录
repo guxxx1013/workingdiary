@@ -1319,20 +1319,9 @@ gitlab
 先commit push 完本地分支代码， 然后切换到需要merge的主分支代码中， 选择远程我的代码， 点击merge。
 然后解决冲突。解决完后再push上去。然后修改部分deploy到maven仓库
 
-页面打断点：
+页面打断点：！
 Sources 左边 localhost：8000  ==> payData.js
 
+参考 thirdPartMoney orderQuery
 
-
-
-if (this.selectedValue == 'prepayOrderNo') {
-                const queryUrl = 'prepayOrderNo=' + this.dataNo;
-                ajaxMonitor.getPayDataByPrepayOrderNo(queryUrl).then((res) => {
-                    if (res.code == 200) {
-                        $message.success('查询支付信息成功');
-                        this.searchList = res.data;
-                    } else {
-                        $message.error('出现错误，查询支付信息失败');
-                    }
-                })
-            }
+单条datafix
