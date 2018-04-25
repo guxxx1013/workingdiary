@@ -1327,3 +1327,33 @@ Sources 左边 localhost：8000  ==> payData.js
 单条datafix
 
 主要把要修改的内容修改好了，除了接口外的其他两个工程都正式环境上发好了。
+
+
+{"payContractDTO":{""}}
+测试代码：payContract
+改：{"payContractDTO":{"contractCode":"20180418104633310XLS01RTF5KGVEW","status":44,"userUnionId":55,"validTime":"anglebaby"}}
+改：{"payContractDTO":{"contractCode":"20180418104633310XLS01RTF5KGVEW","status":0}}
+
+
+172.19.152.253:2181
+
+get /DP/SERVER/http:^^service.owitho.com^paycenter^payMiniProgramWXGateService_1.0.0
+
+get /DP/SERVER/http:^^service.owitho.com^paycenter^payModeManageService_1.0.0
+
+set /DP/SERVER/http:^^service.owitho.com^paycenter^contractQueryService_1.0.0 172.19.24.117:4000
+
+zk删除步骤：
+查看zk路径：
+1.cd
+2.cat appenv
+3.找到zk地址：zkserver=172.19.152.253:2181
+exit退出；
+1.找到neo所在目录；
+2.进入./neo ssh -e beta -t 172.19.152.253
+3.进入zk所在操作目录：cd /app/zookeeper/bin
+4.ls
+5.zkCli.sh
+6.get /DP/SERVER/http:^^service.owitho.com^paycenter^payMiniProgramWXGateService_1.0.0
+7.set /DP/SERVER/http:^^service.owitho.com^paycenter^prepayOrderService_1.0.0, 172.19.24.117:4000
+8.172.19.24.117:4000是我们本地的zk

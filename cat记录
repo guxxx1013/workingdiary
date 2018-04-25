@@ -1,9 +1,81 @@
 需要记录的内容：
+2018-04-25 09:00:00 to 2018-04-25 09:59:59
+查到
+2018-04-24 09:00:00 to 2018-04-24 09:59:59
+1.pay-cashier-service
+
+2.pay-cashier-web
+
+3.pay-gate-alipay-service
+
+4.pay-gate-common-service
+
+5.pay-gate-service:
+a.http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f4c-423488-2123?domain=pay-gate-service
+b.http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f33-423483-263?domain=pay-gate-service
+116022
+
+问题总结：
+https://wiki.owitho.com/pages/viewpage.action?pageId=13176153
+
+a.类问题： payMiniProgramWXGateService想在小程序调使用，可是带了h5的token
+b.类问题： payMWXGateService 第二类问题 调用h5，失效token
+
+account:thirdpartyAccountService_1.0.0： queryOpenIdByUserIdAndAppId(QueryOpenIdByUserIdAndAppIdReq) 莫轩他们的接口
+
+
+6.pay-gate-wx-service:
+
+
+两种需要记录发微信的情况：
+【LogScan报警】
+【主机名】: pay-gate-wx-service-2.sv.prod.alsh.xingbianli.com(10.0.36.90)
+【路径】: /data/applogs/pay-gate-wx-service/paygate/weixin_paygate_strategy_err_daily.log
+【规则】: ERROR:\(payWXGate\)
+【匹配次数】: 2次 / 3min(阈值[1])
+【报警时间】: 2018-04-24 11:15:25
+【Last line】: [2018-04-24 11:14:13] (FAILURE)ERROR:(payWXGate) pay use wei xin get openId fail; request：{"appType":"service_account","userIds":[4155252]} result: {"message":"操作成功","resultCode":200,"success":true} (com.lingshou.wxpay.paygate.service.impl.PayMWXGateServiceImpl.pay(PayMWXGateServiceImpl.java:64))
+
+
+【LogScan报警】
+【主机名】: pay-gate-wx-service-1.sv.prod.alsh.xingbianli.com(10.0.31.52)
+【路径】: /data/applogs/pay-gate-wx-service/paygate/weixin_paygate_strategy_err_daily.log
+【规则】: ERROR:\(payWXGate\)
+【匹配次数】: 3次 / 3min(阈值[1])
+【报警时间】: 2018-04-24 11:15:27
+【Last line】: [2018-04-24 11:14:09] (FAILURE)ERROR:(payWXGate) pay use wei xin get openId fail; request：{"appType":"service_account","userIds":[4155252]} result: {"message":"操作成功","resultCode":200,"success":true} (com.lingshou.wxpay.paygate.service.impl.PayMWXGateServiceImpl.pay(PayMWXGateServiceImpl.java:64))
+
+第一类问题： 4月20日通过小程序授权进来，浏览器里带了token，今天的这单是从h5进入的，没有任何小程序打点，看货架是猪八戒的货架。
+
+
+-----------------
+【LogScan报警】
+【主机名】: pay-gate-wx-service-2.sv.prod.alsh.xingbianli.com(10.0.36.90)
+【路径】: /data/applogs/pay-gate-wx-service/paygate/weixin_paygate_strategy_err_daily.log
+【规则】: ERROR:\(payWXGate\)
+【匹配次数】: 13次 / 3min(阈值[1])
+【报警时间】: 2018-04-24 16:51:31
+【Last line】: [2018-04-24 16:51:30] (FAILURE)ERROR:(payWXGate) pay use wei xin get openId fail; request：{"appId":"wxdc8f1e78eed5ee5f","userId":4135291} result: {"resultCode":1002,"resultDesc":"用户对应的微信信息不存在","success":false} (com.lingshou.wxpay.paygate.service.impl.PayMiniProgramWXGateServiceImpl.pay(PayMiniProgramWXGateServiceImpl.java:56))
+
+【LogScan报警】
+【主机名】: pay-gate-wx-service-1.sv.prod.alsh.xingbianli.com(10.0.31.52)
+【路径】: /data/applogs/pay-gate-wx-service/paygate/weixin_paygate_strategy_err_daily.log
+【规则】: ERROR:\(payWXGate\)
+【匹配次数】: 12次 / 3min(阈值[1])
+【报警时间】: 2018-04-24 16:51:31
+【Last line】: [2018-04-24 16:51:21] (FAILURE)ERROR:(payWXGate) pay use wei xin get openId fail; request：{"appId":"wxdc8f1e78eed5ee5f","userId":4135291} result: {"resultCode":1002,"resultDesc":"用户对应的微信信息不存在","success":false} (com.lingshou.wxpay.paygate.service.impl.PayMiniProgramWXGateServiceImpl.pay(PayMiniProgramWXGateServiceImpl.java:56))
+
+第二类问题：应该存在换账号的问题，这个userid对应的token只操作过h5页，对应的unionid只进行过公众号授权。让我再搜搜有没有小程序收银台对这个预付单进行操作的记录，应该是另外一个userid
+是这个usrerid进了小程序收银台，4111637
+
+需要记录的内容：
 2018-04-24 09:00:00 to 2018-04-24 09:59:59
 查到
 2018-04-23 09:00:00 to 2018-04-23 09:59:59
 1.pay-cashier-service
 http://cat.owitho.com/cat/r/m/pay-cashier-service-0a001ef8-423467-833?domain=pay-cashier-service
+错误分析：
+AliPay系统异常
 
 2.pay-cashier-web
 
