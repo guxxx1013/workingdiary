@@ -1331,9 +1331,13 @@ Sources 左边 localhost：8000  ==> payData.js
 
 {"payContractDTO":{""}}
 测试代码：payContract
-改：{"payContractDTO":{"contractCode":"20180418104633310XLS01RTF5KGVEW","status":44,"userUnionId":55,"validTime":"anglebaby"}}
+改：{"payContractDTO":{"contractCode":"20180418104633310XLS01RTF5KGVEW","status":44,"userUnionId":55,"validStartTime":"anglebaby"}}
 改：{"payContractDTO":{"contractCode":"20180418104633310XLS01RTF5KGVEW","status":0}}
+改：{"payContractDTO":{"validStartTime":"Sun Apr 01 00:00:00 CST 2018"}}
 
+{"payContractDTO":{"validStartTime":"1522512000000"}}
+Sun Apr 01 00:00:00 CST 2018
+Wed Apr 25 00:00:00 CST 2018
 
 172.19.152.253:2181
 

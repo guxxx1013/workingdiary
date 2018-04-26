@@ -18,6 +18,9 @@ constant.js修改本地调试；
 const API_ORIGIN = 'http://localhost:8081';
 permission.js
 
+新工程：
+
+npm run build；
 
 数据库修改自增顺讯
 ALTER TABLE table_name AUTO_INCREMENT = 1;
