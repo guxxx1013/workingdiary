@@ -1336,6 +1336,10 @@ Sources 左边 localhost：8000  ==> payData.js
 改：{"payContractDTO":{"validStartTime":"Sun Apr 01 00:00:00 CST 2018"}}
 
 {"payContractDTO":{"validStartTime":"1522512000000"}}
+{"payContractDTO":{"validEndTime":"1522512000000"}}
+
+{"payContractDTO":{}}
+
 Sun Apr 01 00:00:00 CST 2018
 Wed Apr 25 00:00:00 CST 2018
 
@@ -1361,3 +1365,7 @@ exit退出；
 6.get /DP/SERVER/http:^^service.owitho.com^paycenter^payMiniProgramWXGateService_1.0.0
 7.set /DP/SERVER/http:^^service.owitho.com^paycenter^prepayOrderService_1.0.0, 172.19.24.117:4000
 8.172.19.24.117:4000是我们本地的zk
+
+三个工程
+权限控制等工作
+条件筛选，查看所有签约列表， 条件筛选，web工程， service工程， 前端工程。 + 分页
