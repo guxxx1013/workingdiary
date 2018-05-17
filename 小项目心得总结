@@ -204,3 +204,6 @@ public interface UserMapper {
 Mybatis配置文件
 8.PayModeManageMapper.xml --> 对应PayModeManageMapper.java的具体实现
 9.appcontext-server.xml  对应第5 spring配置文件
+
+第十周：
+重构代码重构 CallBackTriggerService batchTriggerRefundCallBack

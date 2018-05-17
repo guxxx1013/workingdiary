@@ -57,7 +57,8 @@ execution plugins 用否？
     <artifactID></artifactId>
     <version></version>
     <type></type>
-    <scope>test</scope>//六种 compile为默认  provided runtime test system imort
+    <scope>test</scope>//六种 compile为默认  provided run
+     test system imort
     <optional></optional>//默认为false 可依赖
     <exclusions>坐标</exclusions>防止传递依赖 排除依赖
     例：
@@ -1336,9 +1337,13 @@ Sources 左边 localhost：8000  ==> payData.js
 改：{"payContractDTO":{"validStartTime":"Sun Apr 01 00:00:00 CST 2018"}}
 
 {"payContractDTO":{"validStartTime":"1522512000000"}}
-{"payContractDTO":{"validEndTime":"1522512000000"}}
+{"payContractDTO":{"validEndTime":"1527782400000"}}
+
+{"payContractDTO":{"validStartTime":"1522512000000","validEndTime":"1527782400000"}}
 
 {"payContractDTO":{}}
+
+ORDER BY id DESC,
 
 Sun Apr 01 00:00:00 CST 2018
 Wed Apr 25 00:00:00 CST 2018
@@ -1366,6 +1371,152 @@ exit退出；
 7.set /DP/SERVER/http:^^service.owitho.com^paycenter^prepayOrderService_1.0.0, 172.19.24.117:4000
 8.172.19.24.117:4000是我们本地的zk
 
+//./neo ssh -e prod -t 10.0.30.248
+
 三个工程
 权限控制等工作
 条件筛选，查看所有签约列表， 条件筛选，web工程， service工程， 前端工程。 + 分页
+
+如何调第三方数据文档看了一下。滤清楚思路，调第三方接口程序，今天写完，然后接入前端，对比数据。
+
+offical:
+{"contractCode":"20180428090820637XBL04BCGGDYTF2","contractType":""}
+beta:
+  {"contractCode":"20180420163630787XLS01R4D0FN7T2","contractType":""}
+综合：
+{"contractCode":"20180428090820637XBL04BCGGDYTF2","contractType":""}
+{"contractCode":"20180502140100752XBL04L3IJULDQ1","contractType":""}
+
+把调用第三方接口，策略分发，拉数据，接口写完，调完，前端也面处理数据库和第三方交互，然后后端的话，更新第三方数据到数据库的接口。
+payContractManageDTO
+manage接口测试：
+{"payContractManageDTO":{"contractCode":"20180428195736128XBL04T035W05OJ","thirdPartContractNo":"20185228429699999","contractType":10,"userUnionId":999,"status":22,"validTime":""}}
+
+页面对比数据分页写完了，然后做一些优化，调试，修改，检查。
+
+有：1，2, 4, 5
+无：tx cat-core
+
+蓝色：
+都有
+
+2.web.xml
+加抬头
+
+红色以下都有了
+
+3.修改
+有的会跳
+
+
+248
+
+
+https://paycenter.owitho.com/payContract/mainpage
+
+权限匹配：
+beta环境：http://my.owitho.intra.im/
+线上环境：https://my.owitho.com/
+
+select r.name, concat(p.prefix, '_', p.module,":",p.operation,":",p.value) as permission
+
+boolean isxxxx = SecurityUtils.getSubject().isPermitted("paycenter_operate:all:");
+不是
+boolean isxxxxx = SecurityUtils.getSubject().isPermitted("paycenter_operate_all:");
+
+https://static.qa.xingbianli.cn/app/app-pay-center/44c1b29bd2612ddd8ad747259adebb92.png
+
+
+圣哥小技巧总结：
+进入状态，打开控制器，查看接口GetSomeoneDoingList.do ---> XHR
+
+https://www.bejson.com/ 在线JSON校验格式化工具
+
+@RestController
+注解相当于@ResponseBody ＋ @Controller合在一起的作用
+@RestController注解，相当于@Controller+@ResponseBody两个注解的结合，
+返回json数据不需要在方法前面加@ResponseBody注解了，但使用@RestController这个注解，
+就不能返回jsp,html页面，视图解析器无法解析jsp,html页面
+
+
+aop代码 exception 拦截器 熟悉了一下用法， callbackservice错误分析，然后研究了一下。
+
+【LogScan报警】
+【主机名】: pay-gate-service-3.sv.prod.alsh.xingbianli.com(10.0.31.76)
+【路径】: /data/applogs/pay-gate-service/paygate/abstract_third_paygate_strategy_err_daily.log
+【规则】: ERROR:\(payGate\)
+【匹配次数】: 1次 / 3min(阈值[1])
+【报警时间】: 2018-05-09 14:30:59
+【Last line】: [2018-05-09 14:30:03] (FAILURE)ERROR:(payGate) pay gate fail ,req = {"payOrderNo":"20180509142957XBL0000000FH2NCUU","payOrderV2Bean":{"bizType":2,"discountMoney":0.00,"expireTime":900,"payChannel":2,"payMethod":67,"payOrderId":26032092,"paySubject":"猩便利-商品支付","prepayOrderNo":"20180509142955XBL0000000FHYHOD1","returnUrl":"https://h5.xingbianli.com/app/app-openrack-h5/main.html#/order/XBL0000000EVJGMQ6","subjectBody":"[{\"goodsName\":\"脉动维生素饮料青柠味600ml\",\"goodsNum\":1,\"goodsPrice\":6.00}]","thirdPartMoney":6.00,"totalPayMoney":6.00,"tradeNo":"20180509142957XBL0000000FH2NCUU","userId":4193838,"userIp":"112.65.48.232"}} (com.lingshou.pay.cashier.paychannel.strategy.AbstractGatewayV2Strategy.payGate(AbstractGatewayV2Strategy.java:90))
+
+报警为免密支付  第三方返回状态是下单成功支付处理中  支付中心应该将该场景订单状态修改为支付中   不应该抛出异常报错  callback错误 修改订单状态
+只能从支付中（32）到　支付完成（64）解决方案
+修改response处理   cover下单成功支付处理中 这种场景
+
+///////此处酋长手动到数据库把0 改成 32  然后手动模拟调用callback接口，但是由于三张表忘了修一张表(prepayOrder, payOrder, paycenter_order)，
+只手动修复了两张表，所以出现以下错误。
+///////
+【LogScan报警】
+【主机名】: pay-cashier-service-1.sv.prod.alsh.xingbianli.com(10.0.30.248)
+【路径】: /data/applogs/pay-cashier-service/call_back/call_back_err_daily.log
+【规则】: ERROR:\(callBack\)
+【匹配次数】: 1次 / 3min(阈值[1])
+【报警时间】: 2018-05-09 14:52:26
+【Last line】: [2018-05-09 14:51:46] (FAILURE)ERROR:(callBack)third part pay method call back exception, req:{"payCompleteTime":1525847402000,"payOrderNo":"20180509142957XBL0000000FH2NCUU","resultCode":"T","thirdPartOrderId":"2018050921001004170545469778"} (com.lingshou.pay.cashier.callback.service.impl.CallBackServiceImpl.callBackNew(CallBackServiceImpl.java:153))
+//////////////
+
+【LogScan报警】
+【主机名】: pay-cashier-service-1.sv.prod.alsh.xingbianli.com(10.0.30.248)
+【路径】: /data/applogs/pay-cashier-service/notify/notify2biz_err_daily.log
+【规则】: ERROR:\(callBack\)
+【匹配次数】: 4次 / 3min(阈值[1])
+【报警时间】: 2018-05-10 15:58:58
+【Last line】: [2018-05-10 15:58:33] (FAILURE)ERROR:(callBack)notify to biz fail,request:{"charset":"UTF-8","type":"POST","soTimeout":5000,"url":"","needBaAuthorith":false,"topic":"topic_pay2biz","contentType":{"charset":"ISO-8859-1","mimeType":"application/x-www-form-urlencoded"},"properties":{"bizType":"2","tradeNo":"20180507141458XBL0000000FH2NC4H","notifyTime":"2018-05-10 15:58:33","sign":"7d527beb4a82cbf4da28fa749928ba9f","thirdPartOrderId":"4200000121201805074734155121","bizOrderId":"24951864","totalFee":"6.00","payMethod":"35","payChannel":"1","partnerId":"100001","thirdPartMoney":"6.00","failDesc":"补数据","outNo":"XBL0000000EUSZC3C","payCenterId":"25990824","payCompleteTime":"2018-05-07 14:15:06","isSuccess":"T"}} (com.lingshou.pay.cashier.callback.respository.NotifyBizRepository.notifyToBiz(NotifyBizRepository.java:78))
+
+【LogScan报警】
+【主机名】: pay-cashier-service-1.sv.prod.alsh.xingbianli.com(10.0.30.248)
+【路径】: /data/applogs/pay-cashier-service/notify/notify2biz_err_daily.log
+【规则】: ERROR:\(callBack\)
+【匹配次数】: 4次 / 3min(阈值[1])
+【报警时间】: 2018-05-10 16:01:58
+【Last line】: [2018-05-10 15:59:13]
+(FAILURE)ERROR:(callBack)notify to biz fail,request:{"charset":"UTF-8","type":"POST","soTimeout":5000,"url":"","needBaAuthorith":false,"topic":"topic_pay2biz","contentType":{"charset":"ISO-8859-1","mimeType":"application/x-www-form-urlencoded"},"properties":{"bizType":"2","tradeNo":"20180509142955XBL0000000FHYHOD1","notifyTime":"2018-05-10 15:59:13","sign":"c37e2a83c4216921aa83b8d3a4fc2b98","thirdPartOrderId":"2018050921001004170545469778","bizOrderId":"24986182","totalFee":"6.00","payMethod":"67","payChannel":"2","partnerId":"100001","thirdPartMoney":"6.00","failDesc":"补数据","outNo":"XBL0000000EVJGMQ6","payCenterId":"26032092","payCompleteTime":"2018-05-09 14:30:02","isSuccess":"T"}} (com.lingshou.pay.cashier.callback.respository.NotifyBizRepository.notifyToBiz(NotifyBizRepository.java:78))
+
+报错是修复数据导致的误报，后续会把这个日志去除]]
+
+notify URl报错
+
+日志进入方式：
+./neo ssh -e prod -t 10.0.30.248
+cd ../
+ls -l
+cd data
+cd applogs
+cd pay-cashier-service
+
+zgrep "fail" notify2biz_err_daily.log.2018-05-10.gz
+
+
+新的类
+
+public class PayContractThirdPartRepository implements ApplicationContextAware, 接口 {
+
+private ApplicationContext applicationContext;
+
+@Override
+public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    this.applicationContext = applicationContext;
+    }
+}
+
+if（stratgyKey.equals(1)) {
+  IContractStrategy strategy = (AliPayPayContractQueryStrategyImpl)applicationContext.getBean("aliAppContractStrategy");
+}
+
+MOCK数据：
+prepay_order_no = "20180514110226XBL0000000FJGJJ4L" ;
+pay_order_no = "20180514110237XBL0000000FIJLNNM"
+
+接口测试：
+时间戳
+{"refundCallBackInDTO":{"refundNo":"20170802215215XBL000000000003S2","refundCompleteTime":"1501681380000"}}

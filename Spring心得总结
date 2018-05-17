@@ -55,3 +55,64 @@ SpringMVC:
    <property name = "prefix" value = "/WEB-INF/pages/"></property>
    <property name = "suffix" value =".jsp"></property>
 </bean>
+
+@ControllAdvice注解：
+@ControllAdvcie
+public class userAdvice {
+  @ModelAttribute("user")
+    public User getUserInfo(HttpServletRequest request, HttpServletResponse response) {
+      return user;
+    }
+}
+
+@RequestMapping("/abcdefg")
+@ResponseBody
+@CrossOrigin
+    public ResponseVO<User> getUser(@ModelAttribute("user") User user){
+        return ResponseVOBuilder.buildNormalResponse(user);
+    }
+
+这里面user 就会自动装配到user里，属于全局变量。所有都可以配置
+
+
+AOP常规做法：
+在servlet-context。xml加入注解
+<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+
+@interface 注解类:
+例：
+AuthRequired.java
+@Target({ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AuthRequired {
+    String authType() default "";
+    String CHECK_TOKEN = "checkToken";
+}
+
+@Target 和 @Retention 关键字用法；
+https://blog.csdn.net/bluetjs/article/details/52250596
+
+AuthAspect.java AOP切面实现层
+例：
+@Component //!!!!!!!!!!
+@Aspect
+public class AuthAspect {
+  @Pointcut("@annotation(com.owitho.pay.web.base.security.annotation.AuthRequired)") 此处找到上面对应切点
+  public void authCheck() {
+  }
+
+  @Before("authCheck()") {
+    具体实现;
+    MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+    Method method = methodSignature.getMethod();
+    AuthRequired authRequired = method.getAnnotation(AuthRequired.class);
+
+    authRequired.authType() ///////从注解获得的内容
+  }
+}
+
+Controller层
+@AuthRequired(authType = AuthRequired.CHECK_BLACKLIST)
+public Map<String,Object> payGate(HttpServletRequest request,@PathVariable("prepayNo") String prepayNo,
+            @RequestBody PayGateEntity payGateEntity){
+  可对其赋值

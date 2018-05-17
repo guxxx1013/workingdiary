@@ -1,0 +1,141 @@
+小技巧总结：
+五月：
+5.3：
+String.format()用法：
+用于拼接数据。
+例：
+System.out.println(String.format("我的名字叫%s", "小明")); // 打印:我的名字叫小明
+String.format("我叫%s,她叫%s", "小明","小方"); // 我叫小明,她叫小方
+1$ 2$用于指定位置
+这里会按顺序分别把小明,小方填入到对应的%s中. 如果我们要把小方填在前面,小明填在后面,
+String.format("我叫%2$s,她叫%1$s", "小明","小方"); // 我叫小方,她叫小明
+
+如何做策略分发：
+参考文档：https://docs.alipay.com/pre-open/20170601105911096277/wob270
+官方文档实例:
+AlipayClient alipayClient = new DefaultAlipayClient("https://openapi.alipay.com/gateway.do","app_id","your
+private_key","json","GBK","alipay_public_key","RSA2");
+AlipayUserAgreementQueryRequest request = new AlipayUserAgreementQueryRequest();
+request.setBizContent("{" +
+"\"personal_product_code\":\"GENERAL_WITHHOLDING_P\"," +
+"\"alipay_user_id\":\"2088101122675263\"," +
+"\"alipay_logon_id\":\"abx@alitest.com\"," +
+"\"sign_scene\":\"INDUSTRY|MEDICAL\"," +
+"\"external_agreement_no\":\"test\"," +
+"\"third_party_type\":\"PARTNER\"," +
+"\"agreement_no\":\"20170322450983769228\"" +
+" }");
+AlipayUserAgreementQueryResponse response = alipayClient.execute(request);
+if(response.isSuccess()){
+System.out.println("调用成功");
+} else {
+System.out.println("调用失败");
+}
+
+策略分发代码结构：
+
+IQueryStrategy---->总接口（需要调用的策略全部继承这个接口）
+->实现类：AliPayPayContractQueryStrategyImpl(用于实现需要返回的数据类型和内容层)
+->AliPayPayContractQueryAgent(根据文档在这里进行配置，用于返回response结果集)
+
+策略分发：具体如何策略分发代码，参见PayContractThirdPartRepository
+
+
+5.4
+1.element-ui: el-table 的话 只能读list类型数据
+例：
+前端：对单一数据进行List处理：
+columnContractList:[]
+
+this.payContractColumnValue.contractCode = vSearch.contractCode;
+this.payContractColumnValue.contractType = vSearch.contractType;
+this.payContractColumnValue.status = vSearch.status;
+this.payContractColumnValue.thirdPartContractNo = vSearch.thirdPartContractNo;
+this.payContractColumnValue.userUnionId = vSearch.userUnionId;
+this.payContractColumnValue.validTime = vSearch.validTime;
+
+this.columnContractList[0] = this.payContractColumnValue;
+
+2.并行处理事件，不要平行去写事件，
+要一个方面里面套另一个方法，这种形式比较合理。
+
+3.居中css写法参考：
+.showCenter {
+    text-align:center;
+    width:100%;
+    height:100%;
+    margin:0px;
+}
+
+4.表数据 @JsonIgnoreProperties(ignoreUnknown = true)
+
+@RequestMapping("/queryByCondition")
+@CrossOrigin
+@ResponseBody
+public Map<String, Object> generatePayContractByCondition(@RequestBody PayContractTransVO payContractTransVO)
+
+可解决null问题，未知没有变量参数自动赋值null
+
+
+5.7：
+order by sql写法顺序
+<include refid="selectSql"/>
+<include refid="whereSql"/>
+ORDER BY id desc
+limit #{offset}, #{limit}
+
+语法：
+SELECT select_list　　　
+FROM table_name　　
+[ WHERE search_condition ]　　
+[ GROUP BY group_by_expression ]　　
+[ HAVING search_condition ]　　
+[ ORDER BY order_expression [ ASC | DESC ] ]
+[limit m,n]
+
+HTTP：
+HTTP之URL
+HTTP使用统一资源标识符（Uniform Resource Identifiers, URI）来传输数据和建立连接。URL是一种特殊类型的URI，包含了用于查找某个资源的足够的信息
+URL,全称是UniformResourceLocator, 中文叫统一资源定位符,是互联网上用来标识某一处资源的地址。以下面这个URL为例，介绍下普通URL的各部分组成：
+http://www.aspxfans.com:8080/news/index.asp?boardID=5&ID=24618&page=1#name
+
+从上面的URL可以看出，一个完整的URL包括以下几部分：
+1.协议部分：该URL的协议部分为“http：”，这代表网页使用的是HTTP协议。在Internet中可以使用多种协议，如HTTP，FTP等等本例中使用的是HTTP协议。在"HTTP"后面的“//”为分隔符
+2.域名部分：该URL的域名部分为“www.aspxfans.com”。一个URL中，也可以使用IP地址作为域名使用
+3.端口部分：跟在域名后面的是端口，域名和端口之间使用“:”作为分隔符。端口不是一个URL必须的部分，如果省略端口部分，将采用默认端口
+4.虚拟目录部分：从域名后的第一个“/”开始到最后一个“/”为止，是虚拟目录部分。虚拟目录也不是一个URL必须的部分。本例中的虚拟目录是“/news/”
+5.文件名部分：从域名后的最后一个“/”开始到“？”为止，是文件名部分，如果没有“?”,则是从域名后的最后一个“/”开始到“#”为止，是文件部分，如果没有“？”和“#”，那么从域名后的最后一个“/”开始到结束，都是文件名部分。本例中的文件名是“index.asp”。文件名部分也不是一个URL必须的部分，如果省略该部分，则使用默认的文件名
+6.锚部分：从“#”开始到最后，都是锚部分。本例中的锚部分是“name”。锚部分也不是一个URL必须的部分
+7.参数部分：从“？”开始到“#”为止之间的部分为参数部分，又称搜索部分、查询部分。本例中的参数部分为“boardID=5&ID=24618&page=1”。参数可以允许有多个参数，参数与参数之间用“&”作为分隔符。
+
+#的涵义
+#代表网页中的一个位置。其右面的字符，就是该位置的标识符。比如，http://www.example.com/index.html#print就代表网页index.html的print位置。浏览器读取这个URL后，会自动将print位置滚动至可视区域。
+为网页位置指定标识符，有两个方法。一是使用锚点，比如<a name="print"></a>，二是使用id属性，比如<div id="print">
+
+Spring:
+@ControllAdvcie注解
+
+http协议详解：
+https://www.cnblogs.com/ranyonsue/p/5984001.html
+
+5.8：
+vue加载图片
+
+5.9:
+@interface 注解类:
+@Target 和 @Retention 关键字用法；
+https://blog.csdn.net/bluetjs/article/details/52250596
+AuthAspect.java AOP切面实现层
+
+Controller 层
+@AuthRequired(authType = AuthRequired.CHECK_BLACKLIST)
+
+
+
+
+
+
+
+
+
+生活：玩笑：眼药水，玩笑看美女看多了。早到，可以早点来看hr小姐姐哈

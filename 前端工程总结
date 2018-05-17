@@ -88,9 +88,130 @@ ftl本地调试
 <script src="http://localhost:8000/dist/static/manifest.js"></script>
 <script src="http://localhost:8000/dist/static/common.js"></script>
 <script src="http://localhost:8000/dist/static/payData.js"></script>
-
 </body>
 </html>
 
 页面打断点调试：
 打开inspect， Sources 左边 localhost：8000， 选中需要打断点的js (例：payData.js)再点击需要的（两次）。
+
+table单行数据拉取：
+abc(scope.row)
+abc: function(val) {
+  可以对val.xxxxx进行操作
+}，
+
+优化单独赋值方案：
+bad method:
+queryDataFromDataBase: function(vSearch) {
+        this.payContractColumnValue.contractCode = vSearch.contractCode;
+        this.payContractColumnValue.contractType = vSearch.contractType;
+        this.payContractColumnValue.status = vSearch.status;
+
+},
+Good method:
+queryDataFromDataBase: function(vSearch) {
+  const payContractColumnValue = {
+      contractType: vSearch.contractType
+      contractCode: vSearch.contractCode
+      status : vSearch.status
+  };
+},
+
+重构显示数据格式：
+:formatter="showContractType"
+showContractType: function(row, column) {
+    if (row[column.property] == 10) {
+         return '微信';
+    }
+    if (row[column.property] == 11) {
+         return '微信小程序';
+    }
+    return '未知状态';
+},
+
+分页:
+payContractTrans: {
+      contractCode: null,
+      userUnionId: null,
+      status: null,
+      validStartTime: null,
+      validEndTime: null,
+      page: null,
+      pageSize: 10,
+      totalSize: 0,
+      currentPage: 1
+  },
+
+<el-pagination
+    background
+    layout="total, sizes, prev, pager, next" //总页数，sizes选择， 前，页数，后
+    :page-sizes="[10, 20, 30, 40]" //分页数量
+    :total="payContractTrans.totalSize"//唯一必须从后端读取总数据数变量
+    :page-size="payContractTrans.pageSize"//传入后端变量用于分页数据查找
+    :current-page="payContractTrans.currentPage"//传入后端变量用于分页数据查找
+    @current-change="handleCurrentChange"//点击赋值到currentPage
+    @size-change="handleSizeChange"//点击赋值到pageSize
+>
+</el-pagination>
+
+controller层，必须在datalist 外面外包一层，为了获得totalSize数据。建议用PageResponse。
+
+service mybatis 层，
+<select id = "queryPageByCondition" parameterType="map" resultType="com.lingshou.pay.cashier.po.ContractPo">
+       <include refid="selectSql"/>
+       <include refid="whereSql"/>
+       limit #{limit}, #{offset}
+</select> 这里写错了！！！！！！！！！不是的应该是limit offset倒过来就行了。可运行只是前面赋值也反了。
+
+limit #{offset}, #{limit}
+limit是指显示多少数据， offset是指从第几条开始显示。
+
+offset = Page() > 0 ? (Page() - 1) * PageSize() : 0;
+limit = PageSize();
+
+例
+语句1：select * from student limit 9,4
+语句2：slect * from student limit 4 offset 9
+// 语句1和2均返回表student的第10、11、12、13行
+//语句2中的4表示返回4行，9表示从表的第十行开始
+
+后端时间传入前端处理：
+:formatter="formatValidTime"
+formatValidTime: function(row, column) {
+    if (row[column.property] == null || row[column.property] == new Date(0)) {
+        return '无';
+    }
+    return new Date(row[column.property]).Format('yyyy-MM-dd hh:mm:ss');
+},
+
+前端时间传入后端date类型处理
+this.updatePayContractData.validTime = new Date(this.searchThirdPartList[0].validTime);
+
+vue如何加载图片:
+我们工程一般用背景图片作为如何加载图片，把图片写在css里面
+
+例：
+.logoImage {
+    background-image: url("../../images/xinlogo.png");
+    background-size:400px 300px;
+    text-align:center;
+    margin-left: 500px;
+    display: block;
+    width: 440px;
+    height: 300px;
+}
+
+<div class = "logoImage">
+</div>
+
+计算机网络部分：
+https://blog.csdn.net/lipeigang1109/article/details/59057525
+HTTP Request Header 请求头
+Content-Type: 请求的与实体对应的MIME信息
+Accept: 指定客户端能够接收的内容类型
+Connection: 表示是否需要持久连接。（HTTP 1.1默认进行持久连接）
+Accept-Language:浏览器可接受的语言
+Accept-Encoding: 指定浏览器可以支持的web服务器返回内容压缩编码类型
+Cookie: HTTP请求发送时，会把保存在该请求域名下的所有cookie值一起发送给web服务器。
+User-Agent: User-Agent的内容包含发出请求的用户信息
+Referer : 先前网页的地址，当前请求网页紧随其后,即来路
