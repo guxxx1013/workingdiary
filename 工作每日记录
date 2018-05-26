@@ -1091,7 +1091,7 @@ prod-paycashier-web     ---> paycore/gate
 rm -rf *.iml
 rm -rf .idea
 
-上周：熟悉上线
+
 
 2.熟悉git协作分支策略，会使用常用命令；
 3.熟悉支付中心各应用模块的用途以及之间的调用关系
@@ -1132,7 +1132,10 @@ rm -rf .idea
 测试问题：
 进入
 http://localhost:4080/services进行测试
-http://172.19.24.117:4080/services
+http://172.19.24.117:4080/
+
+payjobs:
+http://172.19.24.144:4080/services
 
 或者进入（不确定）
 先发布到分支上
@@ -1331,7 +1334,7 @@ Sources 左边 localhost：8000  ==> payData.js
 
 
 {"payContractDTO":{""}}
-测试代码：payContract
+代码：payContract
 改：{"payContractDTO":{"contractCode":"20180418104633310XLS01RTF5KGVEW","status":44,"userUnionId":55,"validStartTime":"anglebaby"}}
 改：{"payContractDTO":{"contractCode":"20180418104633310XLS01RTF5KGVEW","status":0}}
 改：{"payContractDTO":{"validStartTime":"Sun Apr 01 00:00:00 CST 2018"}}
@@ -1519,4 +1522,28 @@ pay_order_no = "20180514110237XBL0000000FIJLNNM"
 
 接口测试：
 时间戳
-{"refundCallBackInDTO":{"refundNo":"20170802215215XBL000000000003S2","refundCompleteTime":"1501681380000"}}
+{"tradeNo":"20180126104103334XLS0000VCCCFKG"}
+
+{"refundCallBackInDTO":{"refundNo":"20170808151208XBL00000000000MKF","refundCompleteTime":"1501681380000"}}
+
+修复数据：
+【LogScan报警】
+【主机名】: pay-cashier-service-1.sv.prod.alsh.xingbianli.com(10.0.30.248)
+【路径】: /data/applogs/pay-cashier-service/call_back/call_back_err_daily.log
+【规则】: ERROR:\(callBack\)
+【匹配次数】: 1次 / 3min(阈值[1])
+【报警时间】: 2018-05-21 09:43:30
+【Last line】: [2018-05-21 09:40:31] (FAILURE)ERROR:(callBack)third part pay method call back exception, req:{"failDesc":"支付成功","payCompleteTime":1526866830000,"payOrderNo":"20180521094024XBL0000000FKRVOCM","resultCode":"T","thirdPartOrderId":"2018052121001004290578991590"} (com.lingshou.pay.cashier.callback.service.impl.CallBackServiceImpl.callBackNew(CallBackServiceImpl.java:153))
+UPDATE `ls_pct_payorder` SET `pay_status` = 32 WHERE `pay_order_no` IN ('20180521094024XBL0000000FKRVOCM', '20180521082544XBL0000000FKQFXV8');
+UPDATE `ls_pct_prepayorder` SET `pay_status` = 32 WHERE `prepay_order_no` IN ('20180521094022XBL0000000FLQJ11T', '20180521082541XBL0000000FLP2TYJ');
+UPDATE `ls_paycenter_order` SET `pay_status` = 32 WHERE `trade_no` IN ('20180521094022XBL0000000FLQJ11T', '20180521082541XBL0000000FLP2TYJ');
+
+./neo ssh-tunnel -e prod -t 10.0.36.57 -p 4080:4080
+
+
+and update_time >= #{startTime}
+and update_time &lt;= #{endTime}
+
+{"tradeNo":"20180521172519XBL0000000FKYY4RC"}
+
+0 0 0/1 * * ?

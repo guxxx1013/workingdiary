@@ -1,6 +1,42 @@
+2018-05-21
+【LogScan报警】
+【主机名】: pay-cashier-service-2.sv.prod.alsh.xingbianli.com(10.0.36.57)
+【路径】: /data/applogs/pay-cashier-service/call_back/call_back_err_daily.log
+【规则】: ERROR:\(callBack\)
+【匹配次数】: 1次 / 3min(阈值[1])
+【报警时间】: 2018-05-21 08:28:49
+【Last line】: [2018-05-21 08:25:51] (FAILURE)ERROR:(callBack)third part pay method call back exception, req:{"failDesc":"支付成功","payCompleteTime":1526862349000,"payOrderNo":"20180521082544XBL0000000FKQFXV8","resultCode":"T","thirdPartOrderId":"2018052121001004290580707110"} (com.lingshou.pay.cashier.callback.service.impl.CallBackServiceImpl.callBackNew(CallBackServiceImpl.java:153))
+
+【LogScan报警】
+【主机名】: pay-gate-service-2.sv.prod.alsh.xingbianli.com(10.0.36.89)
+【路径】: /data/applogs/pay-gate-service/paygate/abstract_third_paygate_strategy_err_daily.log
+【规则】: ERROR:\(payGate\)
+【匹配次数】: 1次 / 3min(阈值[1])
+
+【报警时间】: 2018-05-21 09:41:56
+【Last line】: [2018-05-21 09:40:29] (FAILURE)ERROR:(payGate) pay gate fail ,req = {"payOrderNo":"20180521094024XBL0000000FKRVOCM","payOrderV2Bean":{"bizType":2,"discountMoney":0.00,"expireTime":900,"payChannel":2,"payMethod":67,"payOrderId":26208397,"paySubject":"猩便利-商品支付","prepayOrderNo":"20180521094022XBL0000000FLQJ11T","returnUrl":"https://h5.xingbianli.com/app/app-openrack-h5/main.html#/order/XBL0000000EYHI3HR","subjectBody":"[{\"goodsName\":\"雀巢咖啡香浓即饮罐装180ml\",\"goodsNum\":1,\"goodsPrice\":4.50}]","thirdPartMoney":4.50,"totalPayMoney":4.50,"tradeNo":"20180521094024XBL0000000FKRVOCM","userId":2223154,"userIp":"223.104.213.100"}} (com.lingshou.pay.cashier.paychannel.strategy.AbstractGatewayV2Strategy.payGate(AbstractGatewayV2Strategy.java:90))
+【LogScan报警】
+【主机名】: pay-gate-service-2.sv.prod.alsh.xingbianli.com(10.0.36.89)
+【路径】: /data/applogs/pay-gate-service/paygate/abstract_third_paygate_strategy_err_daily.log
+【规则】: ERROR:\(payGate\)
+【匹配次数】: 1次 / 3min(阈值[1])
+【报警时间】: 2018-05-21 09:41:56
+【Last line】: [2018-05-21 09:40:29] (FAILURE)ERROR:(payGate) pay gate fail ,req = {"payOrderNo":"20180521094024XBL0000000FKRVOCM","payOrderV2Bean":{"bizType":2,"discountMoney":0.00,"expireTime":900,"payChannel":2,"payMethod":67,"payOrderId":26208397,"paySubject":"猩便利-商品支付","prepayOrderNo":"20180521094022XBL0000000FLQJ11T","returnUrl":"https://h5.xingbianli.com/app/app-openrack-h5/main.html#/order/XBL0000000EYHI3HR","subjectBody":"[{\"goodsName\":\"雀巢咖啡香浓即饮罐装180ml\",\"goodsNum\":1,\"goodsPrice\":4.50}]","thirdPartMoney":4.50,"totalPayMoney":4.50,"tradeNo":"20180521094024XBL0000000FKRVOCM","userId":2223154,"userIp":"223.104.213.100"}} (com.lingshou.pay.cashier.paychannel.strategy.AbstractGatewayV2Strategy.payGate(AbstractGatewayV2Strategy.java:90))
+
+【LogScan报警】
+【主机名】: pay-cashier-service-1.sv.prod.alsh.xingbianli.com(10.0.30.248)
+【路径】: /data/applogs/pay-cashier-service/call_back/call_back_err_daily.log
+【规则】: ERROR:\(callBack\)
+【匹配次数】: 1次 / 3min(阈值[1])
+【报警时间】: 2018-05-21 09:43:30
+【Last line】: [2018-05-21 09:40:31] (FAILURE)ERROR:(callBack)third part pay method call back exception, req:{"failDesc":"支付成功","payCompleteTime":1526866830000,"payOrderNo":"20180521094024XBL0000000FKRVOCM","resultCode":"T","thirdPartOrderId":"2018052121001004290578991590"} (com.lingshou.pay.cashier.callback.service.impl.CallBackServiceImpl.callBackNew(CallBackServiceImpl.java:153))
+
+调用微信接口超时
+
 
 2018-05-15
 http://cat.owitho.com/cat/r/m/pay-gate-service-0a001f33-423994-2270?domain=pay-gate-wx-service
+报警为queryOrder  请求微信超时,解决方案：为No response fail增加重试 调整http连接时间
 
 需要记录的内容：
 2018-04-25 09:00:00 to 2018-04-25 09:59:59
@@ -50,6 +86,7 @@ account:thirdpartyAccountService_1.0.0： queryOpenIdByUserIdAndAppId(QueryOpenI
 【Last line】: [2018-04-24 11:14:09] (FAILURE)ERROR:(payWXGate) pay use wei xin get openId fail; request：{"appType":"service_account","userIds":[4155252]} result: {"message":"操作成功","resultCode":200,"success":true} (com.lingshou.wxpay.paygate.service.impl.PayMWXGateServiceImpl.pay(PayMWXGateServiceImpl.java:64))
 
 第一类问题： 4月20日通过小程序授权进来，浏览器里带了token，今天的这单是从h5进入的，没有任何小程序打点，看货架是猪八戒的货架。
+进入h5进行支付，拿不到h5的openid，因为在h5中并没有授权过。
 
 
 -----------------

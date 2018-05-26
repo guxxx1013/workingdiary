@@ -207,3 +207,6 @@ Mybatis配置文件
 
 第十周：
 重构代码重构 CallBackTriggerService batchTriggerRefundCallBack
+1.统一管理接口做策略工厂
+2.根据不同入参情况进行判断，哪种修复类型，并调用对应实现
+3.

@@ -7,3 +7,11 @@ mysql -u root -p 密码root
 mysql服务启动
 service mysqld start 或 /etc/rc.d/init.d/mysqld start
 2.
+ALTER TABLE ls_paycenter_order AUTO_INCREMENT = 25000000
+
+ALTER TABLE ls_pct_payorder AUTO_INCREMENT = 25000000
+
+ALTER TABLE ls_pct_prepayorder AUTO_INCREMENT = 25000000
+
+MySQL 常用查询语句：
+select * from `ls_pct_prepayorder` WHERE  `mq_biz_notify_status` = 10 and `update_time` <= '2018-01-18 21:00:00' and `update_time` >= '2018-01-18 20:00:00'

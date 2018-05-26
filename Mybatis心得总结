@@ -121,3 +121,6 @@ http://blog.csdn.net/xu1916659422/article/details/77921912
 
   如何返回List类型数据和如何定义resultMap类型
   https://www.cnblogs.com/panxuejun/p/5851622.html
+
+Mybatis 特殊字符
+&lt;= 等于 <=;

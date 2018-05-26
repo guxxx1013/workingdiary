@@ -130,6 +130,59 @@ AuthAspect.java AOP切面实现层
 Controller 层
 @AuthRequired(authType = AuthRequired.CHECK_BLACKLIST)
 
+5.14
+时间转换，单元测试使用：
+String data = "2017-08-02 21:43:00";
+SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+Date testDate = new Date();
+testDate = dateFormat.parse(data);
+
+
+5.15-16
+制作项目设计
+
+5.17
+拼接字符串：
+用StringBuffer pathStart = .....
+  StringBuffer pathEnd = ......
+StringBuffer result = new StringBuffer();
+result.append(pathStart);
+result.append(......);
+
+截取字符串：
+String test = sb.substring(sb.indexof("{"), sb.lastIndexOf("}") + 1);
+
+
+写出文件：
+FileOutPutStream os = new FileOutPutStream(new File("文件需保存路径"), true); true 为append false为重新新建
+os.write((需要写入的string + "").getBytes());
+
+5.21
+Date 转换
+Date声明：
+Date testDay = new Date(); //默认值为系统当前时间 Tue May 22 00:00:00 CST 2018
+使用long类型进行赋值：
+Date testDay = new Date(1526961202606L);
+获取long值：
+testDay.getTime();
+
+控制时间：
+Calendar calendar = Calendar.getInstance();
+calendar.set(Calendar.HOUR_OF_DAY,calendar.get(Calendar.HOUR_OF_DAY) - 1); 把当前时间减一小时
+calendar.getTime(); //Tue May 22 00:00:00 CST 2018
+calendar.getTime().getTime(); //1526961202606L
+https://blog.csdn.net/huawangxin/article/details/53232531
+
+
+
+5.24：
+Java运行时的多态，后期绑定的初始化顺序
+发生了运行时多态的时候，首先初始化基类，然后再初始化子类，然后再后期绑定子类的方法。
+
+5.25
+Pay-Jobs定时工程
+
+
 
 
 
