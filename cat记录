@@ -106,7 +106,7 @@ account:thirdpartyAccountService_1.0.0： queryOpenIdByUserIdAndAppId(QueryOpenI
 【报警时间】: 2018-04-24 16:51:31
 【Last line】: [2018-04-24 16:51:21] (FAILURE)ERROR:(payWXGate) pay use wei xin get openId fail; request：{"appId":"wxdc8f1e78eed5ee5f","userId":4135291} result: {"resultCode":1002,"resultDesc":"用户对应的微信信息不存在","success":false} (com.lingshou.wxpay.paygate.service.impl.PayMiniProgramWXGateServiceImpl.pay(PayMiniProgramWXGateServiceImpl.java:56))
 
-第二类问题：应该存在换账号的问题，这个userid对应的token只操作过h5页，对应的unionid只进行过公众号授权。让我再搜搜有没有小程序收银台对这个预付单进行操作的记录，应该是另外一个userid
+第二类问题：应该存在换账号的问题，这个userid对token只操作过h5页，对应的unionid只进行过公众号授权。让我再搜搜有没有小程序收银台对这个预付单进行操作的记录，应该是另外一个userid
 是这个usrerid进了小程序收银台，4111637
 
 需要记录的内容：

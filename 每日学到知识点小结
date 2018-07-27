@@ -173,6 +173,11 @@ calendar.getTime(); //Tue May 22 00:00:00 CST 2018
 calendar.getTime().getTime(); //1526961202606L
 https://blog.csdn.net/huawangxin/article/details/53232531
 
+时间，只取中间的
+https://zhidao.baidu.com/question/2269393022118945108.html
+Date dateTest = new Date();
+SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+String str = sdf.format(dateTest);
 
 
 5.24：
@@ -182,13 +187,133 @@ Java运行时的多态，后期绑定的初始化顺序
 5.25
 Pay-Jobs定时工程
 
+5.29
+https://www.cnblogs.com/cdf-opensource-007/p/7106018.html
+
+JSON对象转换
+{"appId":"wxac97282f648ad42e"}
+JSON格式字符串与JSON对象之间的转换。
+
+JSONObject jsonObject = JSON.parseObject(JSON_OBJ_STR);
+//JSONObject jsonObject1 = JSONObject.parseObject(JSON_OBJ_STR); //因为JSONObject继承了JSON，所以这样也是可以的
+System.out.println(jsonObject.getString("studentName")+":"+jsonObject.getInteger("studentAge"));
+
+指定Json转换类型：
+Class PrepayOrderPO {
+  String age;
+  String name;
+  get set method
+}
+
+PrepayOrderPO prepayOrderPO = JSON.parseObject(xxxxxxJSON数据xxxxxxxx，PrepayOrderPO.class);
+
+6.20：
+
+    <select id="queryJoinSchedule" parameterType="map" resultType="com.lingshou.bigdata.po.TaskScheduleJoinPO">
+        select
+        taskInfo.`id` as id,
+        taskInfo.`task_name` as task_name,
+        taskInfo.`task_type` as task_type,
+        taskInfo.`file_id` as file_id,
+        taskInfo.`owner` as owner,
+        taskInfo.`auditor` as auditor,
+        taskInfo.`source_table_id` as source_table_id,
+        taskInfo.`target_table_id` as target_table_id,
+        taskInfo.`sql_id` as sql_id,
+        taskInfo.`task_status` as task_status,
+        scheduleInfo.`task_id` as task_id,
+        scheduleInfo.`store_type` as store_type,
+        scheduleInfo.`is_init` as is_init,
+        scheduleInfo.`sche_type` as sche_type,
+        scheduleInfo.`sche_freq` as sche_freq,
+        scheduleInfo.`sche_time` as sche_time,
+        scheduleInfo.`is_depself` as is_depself
+        from `ls_dat_task_info` taskInfo LEFT JOIN `ls_dat_schedule_info` scheduleInfo
+        on taskInfo.`id` =scheduleInfo.`task_id`
+        <include refid="joinWhereTaskSql"/>
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countTaskPage" resultType="int">
+      SELECT count(1)
+      from `ls_dat_task_info` taskInfo LEFT JOIN `ls_dat_schedule_info` scheduleInfo
+      on taskInfo.`id` =scheduleInfo.`task_id`
+      <include refid="joinWhereTaskSql"/>
+    </select>
+
+6.27:
+List<TablePermCheckResultVO> tablePermCheckResultVOList = Lists.newArrayList();
+List<TablePermCheckResultVO> tablePermCheckResultVOList = new ArrayList<>();
+本质上是一样的
+
+6.30：
+对收集到的数据进行分类:
+List<DbTableDdlInfoQueryDTO> dbTableDdlInfoQueryDTOList
+Map<Long, List<DbTableDdlInfoQueryDTO>> dbTableDdlInfoDTOMap = dbTableDdlInfoQueryDTOList.stream().collect(Collectors.groupingBy(DbTableDdlInfoQueryDTO :: getDbId));
+for (Long key : dbTableDdlInfoDTOMap.keySet()) {
+}
+
+7.1：
+Postman 调用get post方法：
+get：正常
+post：组装json格式
+http://localhost:8080/datamanage/dbtable/saveSql
+Headers: Content-type要选   ：application/json
+Body：{"sqlContext":"create table","dbNameSelected":19}
+
+7.2：
+事务管理：
+在ServiceImpl层方法
+@Transactional(rollbackFor =Exception.class)
+
+xml文件配置见前面
+
+7.3：
+player_id是主键
+INSERT INTO ls_account_union VALUES(?,?,?,?,?,?) ON DUPLICATE KEY " + " UPDATE phone=?, phone_status=?, is_valid=?, create_time=?, update_time=?
+insert into player_count(player_id,count) value(1,1) on duplicate key update count=count+1;
+
+7.4：
+连表查询 in join 用法
+
+7.16
+格式转换
+String to Integer
+Integer userId = Integer.parseInt(userWord);
+Double to String
+String.valueOf(double)
+
+7.17
+BeanCopyUtil推荐使用
+AttendanceClassDetailBO bo = BeanCopyUtil.copy(po, AttendanceClassDetailBO.class);
+
+7.18：java8日期处理：
+LocalDateTime begin = LocalDate.now().atStartOfDay();
+LocalDateTime end = begin.plusDays(15);
+
+Date beginDate = Date.from(begin.atZone(ZoneId.systemDefault()).toInstant());
+Date endDate = Date.from(end.atZone(ZoneId.systemDefault()).toInstant());
+
+LocalDate.now() : 2018-07-21
+
+String 类型转localDate
+LocalDate beginDateTime = LocalDate.parse(beginDate, DateTimeFormatter.ofPattern(“yyyy-MM-dd”));
+或者直接用：
+LocalDate.parse(req.getEndDate()) --> LocatDate 类型
 
 
 
+7.19 java8 stream类型：
+将Object中的两个对象转成Map一一对应：
+stream().collect:
+Collectors.toMap
+Map<Integer, Integer> stockCurStockMap = stockBOList.stream().collect(Collectors.toMap(StockBO::getShopId, StockBO::getCurStock));
 
+stream().sorted:
+storeShopSkuStatisticsDataBOList = storeShopSkuStatisticsDataBOList.stream().sorted(Comparator.comparing(StoreShopSkuStatisticsDataBO::getShopId)).collect(toList());
+当有空指针情况处理:
 
-
-
-
-
-生活：玩笑：眼药水，玩笑看美女看多了。早到，可以早点来看hr小姐姐哈
+sql:
+SELECT  `merch_id`, sum(count), `adjustment_reason`,  `create_time`
+FROM `store_sku_stock_optlog`
+where `shop_id` = 50 and `merch_id` = 2310 GROUP BY `create_time` , `adjustment_reason` ORDER BY `create_time` DESC

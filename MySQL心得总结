@@ -6,12 +6,48 @@ mysql -u root -p 密码root
 
 mysql服务启动
 service mysqld start 或 /etc/rc.d/init.d/mysqld start
-2.
+
+2.重置数据库id字段升序号码
 ALTER TABLE ls_paycenter_order AUTO_INCREMENT = 25000000
-
-ALTER TABLE ls_pct_payorder AUTO_INCREMENT = 25000000
-
-ALTER TABLE ls_pct_prepayorder AUTO_INCREMENT = 25000000
 
 MySQL 常用查询语句：
 select * from `ls_pct_prepayorder` WHERE  `mq_biz_notify_status` = 10 and `update_time` <= '2018-01-18 21:00:00' and `update_time` >= '2018-01-18 20:00:00'
+
+3.
+建表：
+DROP TABLE IF EXISTS bulletin;
+
+CREATE TABLE bulletin(
+ id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,             # 主键
+ uid INT(11) NOT NULL DEFAULT 0,    # 创建者id
+ context VARCHAR(600) NOT NULL DEFAULT '',  # 公告详细内容（300字）
+ begintime DEC(20) NOT NULL DEFAULT 0,   # 公告开始时间
+ endtime DEC(20) NOT NULL DEFAULT 0,   # 公告结束时间
+ createtime DEC(20) NOT NULL DEFAULT 0,   # 创建时间
+ modifytime DEC(20) NOT NULL DEFAULT 0   # 修改时间
+
+ PRIMARY KEY (`Id`),
+)DEFAULT CHARSET=UTF8 TYPE=INNODB;
+
+修改原有字段名称及类型：
+ALTER TABLE bulletin CHANGE uid username VARCHAR(50) NOT NULL DEFAULT ''; // 把uid 改成username
+
+4.多条insert语句：
+insert into persons
+(id_p, lastname , firstName, city )
+values
+(200,'haha' , 'deng' , 'shenzhen'),
+(201,'haha2' , 'deng' , 'GD'),
+(202,'haha3' , 'deng' , 'Beijing');
+
+5.时间处理:
+and date = DATE_FORMAT(#{date},'%Y-%m-%d')
+    数据库内               入参
+
+<if test="startDate!=null">
+    <![CDATA[
+        and date >= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+    ]]>
+</if>
+
+6.Sql添加字段

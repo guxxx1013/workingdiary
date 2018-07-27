@@ -1161,7 +1161,6 @@ http://rundeck.intra.im
 
 
 
-
 UPDATE LS_Pct_Paymode
     SET channel = 13,
     method = 32,
@@ -1547,3 +1546,325 @@ and update_time &lt;= #{endTime}
 {"tradeNo":"20180521172519XBL0000000FKYY4RC"}
 
 0 0 0/1 * * ?
+
+
+if(StringUtils.isNotEmpty(payGateV2Context.getAppId())){
+        Map<String,String> contextParams = new HashMap<>();
+        contextParams.put("appId",payGateV2Context.getAppId());
+        contextParams.put("appId",payGateV2Context.getAppId());
+
+        payOrderNewPO.setContextParams(JSON.toJSONString(contextParams));
+    }
+
+
+public String getContexParam() {
+
+  this.getOrderRequest().getTerminalId();
+
+  return contexParam;
+}
+
+public void setContexParam(String contexParam) {
+  this.contexParam = contexParam;
+}
+
+public CreatePrepayOrderReq getOrderRequest() {
+  return orderRequest;
+}
+
+pay-gate-alipay-service 修改文档：
+AliNoPassWordPayBean.java
+AuthCodePayRequestBean.java
+MaliPaymentGatewayRequestBean.java
+
+MaliPayRepository.java
+NoPasswordPayRepository.java
+PayAuthCodeAliGateServiceImpl.java
+
+
+pay-cashier-gate:
+ThirdPayGateReq
+BuildReqUtils
+PrepayOrderPO
+PrepayOrderMapper.xml
+
+PayOrderNewPO payOrderNewPO=new PayOrderNewPO();
+    payOrderNewPO.setTermisn("1");
+    String result=JSONObject.toJSONString(payOrderNewPO);
+    PayOrderNewPO newPO = JSONObject.parseObject(result,PayOrderNewPO.class);
+    System.out.println(newPO);
+
+
+    String contextParams = prepayOrderPO.getContextParams();
+       JSONObject jsonObject = JSON.parseObject(contextParams);
+       if(jsonObject != null) {
+           req.setTerminalId(jsonObject.getString("terminalId"));
+       }
+
+
+JSON测试：{"prepayNo":"20180529200807XLS0000000EVVHNKZ", "payModeId":11}
+
+
+线上打断点：
+选Remote
+configuration
+host: 172.19.24.117 Port:8000
+Search sources using module's classpath pay-cashier-service;
+
+
+alter table ls_pct_prepayorder add context_params varchar(1024) default null;
+
+CREATE TABLE `ls_pct_mq_resend` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `prepay_order_no` varchar(50) DEFAULT NULL COMMENT '预支付订单号',
+  `mq_biz_notify_status` int(11) NOT NULL DEFAULT '0' COMMENT '0：未发送消息 10：已发送消息 20：业务方已收到消息',
+  `trigger_time` datetime DEFAULT NULL COMMENT '下次重新发送给mq时间',
+  `trigger_num` int(11) NOT NULL DEFAULT '0' COMMENT '第几次触发',
+  `is_deleted` int(11) NOT NULL DEFAULT '0' COMMENT '是否已删除此条数据',
+  `is_valid` int(11) NOT NULL DEFAULT '0' COMMENT '是否为有效发送数据，0为有效，1为无效',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `IX_Trigger_Time` (`trigger_time`),
+  KEY `IX_Prepay_Order_No` (`prepay_order_no`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+
+java集合类的实现，
+多线程的调用
+
+增:{"groupFileMappingManageDTO":{"groupId":25,"fileId":32}}
+改：{"groupFileMappingManageDTO":{"id":2, "groupId":44,"fileId":32}}
+查询: {"id":1, "groupId":25}
+{"fileId":32}
+
+数据库重命名sql语句：
+ls_dat_
+
+去除content查询接口：
+SqlInfoQueryService
+
+sqlInfo SqlParamInfoPO 两表添加接口：
+SqlInfoDevService
+
+fileSqlinfo 两表查询接口
+FileSqlInfoQueryService
+
+task四表添加更新接口
+EtlTaskManageService
+
+我们怎么做迁移：2周以后，
+
+三个月为一个q的分享 yarn hadoop 纯技术
+
+Postman:组装json格式
+http://localhost:8080/datamanage/dbtable/saveSql
+Body：
+{"sqlContext":"create table","dbNameSelected":19}
+Content-type要选   ：application/json
+
+{"sqlContext":"CREATE TABLE `ads.ads_beehive_fee_kpi` (`month_id` varchar(20) DEFAULT NULL,`beehive_id` bigint(20) DEFAULT NULL,`kpi_type` varchar(20) DEFAULT NULL,`kpi_id` bigint(20) DEFAULT NULL,`kpi_name` varchar(20) DEFAULT NULL,`kpi_value` bigint(20) DEFAULT NULL,`etl_insert_time` datetime DEFAULT NULL,KEY `idx_beehive_month_id` (`beehive_id`,`month_id`) USING BTREE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4","dbNameSelected":123}
+
+
+CREATE TABLE `ods.rack_order__ls_order_order`(
+  `id` bigint COMMENT '订单自增ID',
+  `view_id` string COMMENT '页面端展示ID',
+  `user_id` bigint COMMENT '用户ID',
+  `seller_type` bigint COMMENT '0:售货机 1：零售店',
+  `seller_id` string COMMENT '售卖机ID/零售店ID',
+  `origin_amount` double COMMENT '订单原始金额',
+  `actual_amount` double COMMENT '订单实际金额',
+  `pay_status` bigint COMMENT '支付状态0 新建 32 待支付 64 支付成功',
+  `refund_status` bigint COMMENT '退款状态 0 无退款 1 退款成功-全部 2 退款成功-部分 3 退款失败',
+  `pay_complete_time` timestamp COMMENT '支付完成时间',
+  `pay_center_id` bigint COMMENT '支付中心订单id',
+  `memo` string COMMENT '备注字段',
+  `create_source` bigint COMMENT '订单来源',
+  `is_visibility` bigint COMMENT '是否可见 0 不可见 1 可见',
+  `create_by` string COMMENT '创建者',
+  `create_time` timestamp COMMENT '创建时间',
+  `update_by` string COMMENT '更新者',
+  `update_time` timestamp COMMENT '更新时间',
+  `etl_insert_time` timestamp COMMENT 'etl insert time')
+COMMENT '订单表'
+PARTITIONED BY (
+  `pt` string COMMENT '日期分区')
+ROW FORMAT SERDE
+  'org.apache.hadoop.hive.ql.io.orc.OrcSerde'
+STORED AS INPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.orc.OrcInputFormat'
+OUTPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat'
+
+
+{"sqlContext":"CREATE TABLE `ods.rack_order__ls_order_order`(  `id` bigint COMMENT '订单自增ID',`view_id` string COMMENT '页面端展示ID',  `user_id` bigint COMMENT '用户ID', `seller_type` bigint COMMENT '0:售货机 1：零售店',`seller_id` string COMMENT '售卖机ID/零售店ID',     `origin_amount` double COMMENT '订单原始金额', `actual_amount` double COMMENT '订单实际金额', `pay_status` bigint COMMENT '支付状态0 新建 32 待支付 64 支付成功', `refund_status` bigint COMMENT '退款状态 0 无退款 1 退款成功-全部 2 退款成功-部分 3 退款失败', `pay_complete_time` timestamp COMMENT '支付完成时间',  `pay_center_id` bigint COMMENT '支付中心订单id', `memo` string COMMENT '备注字段', `create_source` bigint COMMENT '订单来源', `is_visibility` bigint COMMENT '是否可见 0 不可见 1 可见', `create_by` string COMMENT '创建者', `create_time` timestamp COMMENT '创建时间', `update_by` string COMMENT '更新者', `update_time` timestamp COMMENT '更新时间',   `etl_insert_time` timestamp COMMENT 'etl insert time') COMMENT '订单表' PARTITIONED BY ( `pt` string COMMENT '日期分区') ROW FORMAT SERDE    'org.apache.hadoop.hive.ql.io.orc.OrcSerde' STORED AS INPUTFORMAT 'org.apache.hadoop.hive.ql.io.orc.OrcInputFormat'  OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat'", "dbNameSelected":"ods"}
+
+远程断点：
+选remote，
+Host：172.19.25.15
+Port：8000
+bigdata-base=servcie
+
+{"sqlContext":"CREATE TABLE `ods.rack_order__ls_order_order`(  `id` bigint COMMENT '订单自增ID',`view_id` string COMMENT '页面端展示ID',  `user_id` bigint COMMENT '用户ID', `seller_type` bigint COMMENT '0:售货机 1：零售店',`seller_id` string COMMENT '售卖机ID/零售店ID',     `origin_amount` double COMMENT '订单原始金额', `actual_amount` double COMMENT '订单实际金额', `pay_status` bigint COMMENT '支付状态0 新建 32 待支付 64 支付成功', `refund_status` bigint COMMENT '退款状态 0 无退款 1 退款成功-全部 2 退款成功-部分 3 退款失败', `pay_complete_time` timestamp COMMENT '支付完成时间',  `pay_center_id` bigint COMMENT '支付中心订单id', `memo` string COMMENT '备注字段', `create_source` bigint COMMENT '订单来源', `is_visibility` bigint COMMENT '是否可见 0 不可见 1 可见', `create_by` string COMMENT '创建者', `create_time` timestamp COMMENT '创建时间', `update_by` string COMMENT '更新者', `update_time` timestamp COMMENT '更新时间',   `etl_insert_time` timestamp COMMENT 'etl insert time') COMMENT '订单表' PARTITIONED BY ( `pt` string COMMENT '日期分区') ROW FORMAT SERDE    'org.apache.hadoop.hive.ql.io.orc.OrcSerde' STORED AS INPUTFORMAT 'org.apache.hadoop.hive.ql.io.orc.OrcInputFormat'  OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat'", "dbNameSelected":"ods"}
+
+事务命令：
+在ServiceImpl层方法
+@Transactional(rollbackFor =Exception.class)
+
+dao层文件配置：
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.1.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd"
+       default-lazy-init="true">
+
+    <bean class="com.dianping.zebra.dao.mybatis.ZebraMapperScannerConfigurer">
+        <property name="basePackage"
+                  value="com.lingshou.bigdata.mapper.write"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+    </bean>
+
+    <bean id="dataSource" class="com.dianping.zebra.group.jdbc.GroupDataSource" init-method="init">
+        <!-- jdbcRef决定需要访问的库的名字，这里指访问的是test库 -->
+        <property name="jdbcRef" value="h_dat_datadev" />
+        <!-- 选择使用背后使用哪种数据源，"c3p0"或者"tomcat-jdbc"，可以不配，默认值为"c3p0" -->
+        <property name="poolType" value="c3p0" />
+
+        <!-- 选择配置源，默认是remote方式，这里使用的是local方式，意味着配置是本地文件 -->
+        <!--<property name="configManagerType" value="local" /> -->
+
+        <property name="maxIdleTime" value="1800" />
+        <property name="idleConnectionTestPeriod" value="60" />
+        <property name="acquireRetryAttempts" value="3" />
+        <property name="acquireRetryDelay" value="300" />
+        <property name="maxStatements" value="0" />
+        <property name="maxStatementsPerConnection" value="100" />
+        <property name="numHelperThreads" value="6" />
+        <property name="maxAdministrativeTaskTime" value="5" />
+        <property name="preferredTestQuery" value="SELECT 1" />
+        <property name="maxPoolSize" value="500"/>
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="mapperLocations">
+            <list>
+                <value>classpath*:config/sqlmap/write/*.xml</value>
+            </list>
+        </property>
+        <property name="typeAliasesPackage"
+                  value="com.lingshou.pay.cashier.po"/>
+        <property name="configLocation" value="classpath:config/mybatis/mybatis-configuration.xml"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager = "transactionManager" />
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+</beans>
+
+
+
+保存逻辑： 1.先判断sql是否合法
+2.拿到dbname table_name （tableId） operation --->查出dbId
+3.更新ddl表 情况一：ddl数据库表中无数据 直接插入数据
+           情况二： ddl表中已有数据 分类情况一：已执行 -->更新版本，重置审核人 更新状态
+                                 分类情况二：未执行 -->不更新版本，重置审核人 更新状态
+
+审核通过逻辑： 1.先根据ddlId去拿数据，先去更新 同步数据，更新ddl表格
+
+select count(*) as countNo,source_id as sourceId from ls_dat_meta_blood_analysis_hierarchy where type = 30 and source_id in (113,264) group by source_id order by countNo desc
+
+
+v-loading
+stripe
+
+代码
+
+store-commodity-service	门店商品服务
+store-service	门店综合服务
+store-stock-service	门店库存服务
+store-data-service
+
+7.12
+addAll是传入一个List，将此List中的所有元素加入到当前List中，也就是当前List会增加的元素个数为传入的List的大小
+https://zhidao.baidu.com/question/2079751182427721388.html
+List<Integer> merchIdList = Optional.ofNullable(categorySkuPOS).orElse(Lists.newArrayList()).stream().map(CategorySkuPO::getMerchId).collect(toList());
+List<Integer> list = data.entrySet().stream().map(Entry::getValue).collect(Collectors.toList());
+这其中map就是把entry的value值映射出来，最后再用Collectors转成list
+
+去重操作
+merchIds = merchIds.stream().distinct().collect(toList());
+
+{"userIds":73,"channel":44,"method":55,"name":"anglebaby","description":"weixin","status":1,"enabled":1}
+
+{"userIds":73}
+
+http://localhost:8080/ajax/attendance/schedule
+
+
+    <select id="selectByClassIds" resultType="com.lingshou.beehive.attendance.po.AttendanceClassDetailPO">
+        select
+        <include refid="Base_Column_List"/>
+        from beehive_attendance_class_detail
+        where valid = 1 and class_id in
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    private List<ScheduleVO> combineScheduleAndClassDetailDTO(Integer userId, Date date, Integer isToday) {
+        List<ScheduleVO> scheduleVOS = new ArrayList<>();
+        List<AttendanceScheduleDTO> attendanceScheduleDTOS = attendanceScheduleQueryService.listByUserIdDate(userId, date);
+        if(CollectionUtils.isEmpty(attendanceScheduleDTOS)) {
+            return null;
+        }
+        for(AttendanceScheduleDTO attendanceScheduleDTO : attendanceScheduleDTOS) {
+            Integer classId = attendanceScheduleDTO.getClassId();
+            String seq = attendanceScheduleDTO.getSeq();
+            AttendanceClassDetailDTO attendanceClassDetailDTO = attendanceScheduleQueryService.listByClassIdAndSeq(classId, seq);
+            if(attendanceClassDetailDTO != null) {
+                ScheduleVO scheduleVO = new ScheduleVO();
+                scheduleVO.setUserId(userId);
+                scheduleVO.setDate(attendanceScheduleDTO.getDate());
+                scheduleVO.setStartTime(attendanceClassDetailDTO.getStartTime());
+                scheduleVO.setEndTime(attendanceClassDetailDTO.getEndTime());
+                scheduleVO.setFoodHours(String.valueOf(attendanceClassDetailDTO.getFoodHours()));
+                scheduleVO.setIsToday(isToday);
+                scheduleVOS.add(scheduleVO);
+            }
+        }
+        return scheduleVOS;
+    }
+
+    82//
+    字段 代码重写了一下， 库存简单管理过了一下流程
+    查看单门店查询接口+controller service迁移模块后
+
+
+SELECT * FROM `store_sku_stock_report_data` where `shop_id` =21 and `merch_id` =100 order by `record_date`  DESC
+SELECT * FROM kylin_store.`store_sku_stock_report_data` where `shop_id` =21 and `merch_id` =100 order by `record_date`  DESC
+
+SELECT `merch_id`, sum(count), `adjustment_reason`,  `create_time`   FROM `store_sku_stock_optlog` where `shop_id` = 21 AND `merch_id` = 100 group by `create_time`,  `adjustment_reason` order by `create_time` DESC
+
+SELECT * FROM sto_analysis.`store_sku_stock_report_data` where `shop_id` =21 and `merch_id` =100 order by `record_date`  DESC
+
+
+
+
+
+SELECT  `merch_id`, sum(count), `adjustment_reason`,  `create_time`
+FROM `store_sku_stock_optlog`
+where `shop_id` = 50 and `merch_id` = 2310 GROUP BY `DATE_FORMAT`(create_time,'YYYY-MM-DD'), `adjustment_reason` ORDER BY `create_time` DESC
+
+store-data SkuStockReportDataServiceImpl.getInsufficientDetail
+
+
+周三才发现漏了两个子需求，光看了prd，没看需求文档，原来组
+发机器，一慌
+
+code rview早 写代码比较顺利    自测比较全（周二）

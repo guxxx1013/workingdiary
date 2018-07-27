@@ -1,0 +1,85 @@
+
+模块：1.收银模块 2.优惠模块 3.对蜂窝货品进存模块 4.对蜂窝配送模块 5.对蜂窝经营模块  6.对商品管理模块 7.对蜂窝日常管理模块 8.IOT设备模块
+
+store-service(store-server)门店综合服务 ：绿色 蓝色
+
+
+store-commodity-service	门店商品服务
+app,beehive,rack,template
+
+store-stock-service	门店库存服务 ：1.对收银模块： 库存增减接口 2. 对蜂窝配送模块：库存增减接口 紫色+深黄色
+allocation, check, operation, scrap, stock, supply,
+
+store-data-service
+pda蜂窝
+
+candox?
+
+spu_id
+
+索引机制(分享)
+
+
+h_sto_beehive
+kylin_store
+
+beehive_attendance_schedule
+user_id
+
+ 排版时间 class_id+seq
+ beehive_attendance_class_detail
+start_time end_time
+
+store-candox-web
+beehive-service
+
+ https://wiki.owitho.com/pages/viewpage.action?pageId=17997565
+
+
+beehive-base-service 1.18-SNAPSHOT
+ 问题：mybatis后面 jdbcType 格式
+
+
+
+store-data-analysis-web 猪鼻特
+sto_analysis
+
+前端接口： app-store-admin    /ajax/stock/data
+
+字段名称：
+RackPickCount
+RackRejectVerifyCount
+
+抓异常
+
+大飞哥review代码回顾：
+能不封就不封，
+入参数据校验:
+throw new IllegalArgumentException();
+
+拿不到应该拿的到的表：
+throw new ServiceException("query stock opt log fail!");
+
+merchId + shopId 相当于key  -->   skuId
+
+问题：store_sku_stock 更新时间
+
+造数据：
+sto_analysis ---> store_sku_stock  去拿merch_id 和shop_id
+kylin_store       store_shop_sku
+kylin_store       store_sku_stock
+
+select * from `store_sku_stock` where sku_id is null
+
+根据sku_code   查出来的是merch_id
+SELECT sku_id FROM h_scm_tms.commodity_overall where sku_code = '200000003001'
+
+
+库存管理表：
+kylin_store 业务库  sto_analysis: 报表库
+store_sku_stock(kylin_store): key : shop_id + merch_id  主要字段： cur_stock 当前库存(查看当前) 一有新商品一卖出去，一添加就更新
+store_sku_stock_data:(sto_analysis)： key： `shop_id`,`merch_id`,`record_date` 记录历史数据， 的各项参数
+store_sku_stock_optlog商品库存变更记录: 只要一有变更 此表就会更新 记录更新状态
+store_sku_stock_report(kylin_store已废弃， sto_analysis主要用它 store_sku_stock_report_data)商品库存每日报表: 每天2：00更新一次
+
+store_sku_check_stock_detail
