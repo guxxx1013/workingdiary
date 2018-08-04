@@ -24,7 +24,7 @@ request.setBizContent("{" +
 "\"external_agreement_no\":\"test\"," +
 "\"third_party_type\":\"PARTNER\"," +
 "\"agreement_no\":\"20170322450983769228\"" +
-" }");
+" }")
 AlipayUserAgreementQueryResponse response = alipayClient.execute(request);
 if(response.isSuccess()){
 System.out.println("调用成功");
@@ -291,8 +291,16 @@ AttendanceClassDetailBO bo = BeanCopyUtil.copy(po, AttendanceClassDetailBO.class
 LocalDateTime begin = LocalDate.now().atStartOfDay();
 LocalDateTime end = begin.plusDays(15);
 
+LocalDate begin = LocalDate.now();
+LocalDate end = begin.plusDays(15);
+
+LocalDateTime 转 Date
 Date beginDate = Date.from(begin.atZone(ZoneId.systemDefault()).toInstant());
 Date endDate = Date.from(end.atZone(ZoneId.systemDefault()).toInstant());
+
+Date 转 LocalDateTime
+Date date = new Date();
+LocalDateTime localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
 LocalDate.now() : 2018-07-21
 
@@ -308,6 +316,7 @@ LocalDate.parse(req.getEndDate()) --> LocatDate 类型
 stream().collect:
 Collectors.toMap
 Map<Integer, Integer> stockCurStockMap = stockBOList.stream().collect(Collectors.toMap(StockBO::getShopId, StockBO::getCurStock));
+Map<Integer, SkuCommodityBO> map = skuCommodityBOS.stream().collect(Collectors.toMap(SkuCommodityBO::getSkuId, s -> s));
 
 stream().sorted:
 storeShopSkuStatisticsDataBOList = storeShopSkuStatisticsDataBOList.stream().sorted(Comparator.comparing(StoreShopSkuStatisticsDataBO::getShopId)).collect(toList());
@@ -317,3 +326,15 @@ sql:
 SELECT  `merch_id`, sum(count), `adjustment_reason`,  `create_time`
 FROM `store_sku_stock_optlog`
 where `shop_id` = 50 and `merch_id` = 2310 GROUP BY `create_time` , `adjustment_reason` ORDER BY `create_time` DESC
+
+8.1 List集合去重
+1.HashSet去重：（无法保证原来顺序）
+    HashSet h = new HashSet(list);
+    list.clear();
+    list.addAll(h);
+
+2.
+
+8.2 Lion配置
+KEY:
+List<Integer> days = Lion.getList("store-commodity-service.sku.expire.remind.days", Integer.class);

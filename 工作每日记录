@@ -1863,8 +1863,23 @@ where `shop_id` = 50 and `merch_id` = 2310 GROUP BY `DATE_FORMAT`(create_time,'Y
 
 store-data SkuStockReportDataServiceImpl.getInsufficientDetail
 
+生产日期 效期 加上去 主档 保质期带过来
 
-周三才发现漏了两个子需求，光看了prd，没看需求文档，原来组
-发机器，一慌
+production_date
 
-code rview早 写代码比较顺利    自测比较全（周二）
+shelf_lift_count
+shelfLiftCount
+
+
+expire_date
+
+1为 生产日期
+2为 到期日期
+
+
+
+计算在里面计算效期
+http://localhost:8080/ajax/commoditymanage/modifyexpiredate
+
+
+push 其他
