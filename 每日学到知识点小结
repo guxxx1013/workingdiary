@@ -125,7 +125,23 @@ vue加载图片
 @interface 注解类:
 @Target 和 @Retention 关键字用法；
 https://blog.csdn.net/bluetjs/article/details/52250596
+https://blog.csdn.net/briblue/article/details/73824058
+@Retention(RetentionPolicy.RUNTIME)
+RetentionPolicy.SOURCE 注解只在源码阶段保留，在编译器进行编译时它将被丢弃忽视。
+RetentionPolicy.CLASS 注解只被保留到编译进行的时候，它并不会被加载到 JVM 中。
+RetentionPolicy.RUNTIME 注解可以保留到程序运行的时候，它会被加载进入到 JVM 中，所以在程序运行时可以获取到它们
 AuthAspect.java AOP切面实现层
+
+@Target
+ElementType.ANNOTATION_TYPE 可以给一个注解进行注解
+ElementType.CONSTRUCTOR 可以给构造方法进行注解
+ElementType.FIELD 可以给属性进行注解
+ElementType.LOCAL_VARIABLE 可以给局部变量进行注解
+ElementType.METHOD 可以给方法进行注解
+ElementType.PACKAGE 可以给一个包进行注解
+ElementType.PARAMETER 可以给一个方法内的参数进行注解
+ElementType.TYPE 可以给一个类型进行注解，比如类、接口、枚举
+
 
 Controller 层
 @AuthRequired(authType = AuthRequired.CHECK_BLACKLIST)
@@ -178,6 +194,17 @@ https://zhidao.baidu.com/question/2269393022118945108.html
 Date dateTest = new Date();
 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
 String str = sdf.format(dateTest);
+
+DateTimeFormatter:
+eg:
+private static final DateTimeFormatter MONTH_ID_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+LocalDate localDate = LocalDate.parse(dayId.toString(), MONTH_ID_DATE_FORMATTER);
+
+LocalDate String 相互转换：
+  LocalDate date = LocalDate.now();
+  String text = date.format(formatter);
+  LocalDate parsedDate = LocalDate.parse(text, formatter);
+
 
 
 5.24：
@@ -322,6 +349,97 @@ stream().sorted:
 storeShopSkuStatisticsDataBOList = storeShopSkuStatisticsDataBOList.stream().sorted(Comparator.comparing(StoreShopSkuStatisticsDataBO::getShopId)).collect(toList());
 当有空指针情况处理:
 
+stream().filter:
+List<MercuryUserDTO> filterDTOS = userDTOS.stream().filter(dto -> dto.getStatus() == MercuryUserStatusCode.ACTIVE).collect(Collectors.toList());
+List<String> result = language.filter(x -> x!=null).collect(Collectors.toList());
+List<String> result = language.filter(Objects::nonNull).collect(Collectors.toList());
+shopBoList.stream().filter(item -> storeId.equals(item.getCity())).collect(Collectors.toList());
+
+stream().map:
+List<CommodityItemBo> itemBos;
+List<BackCategoryBO> backCategoryBOS = itemBos.stream().map(BoBuildUtils::buildBackCategory).collect(Collectors.toList());
+
+BoBuildUtils.java
+public static BackCategoryBO buildBackCategory(CommodityItemBo commodityItemBo) {
+       BackCategoryBO bo = new BackCategoryBO();
+       bo.setId(commodityItemBo.getClassId());
+       bo.setName(commodityItemBo.getClassName());
+       return bo;
+}
+
+stream().flatMap:
+把几个小的list转换到一个大的list。
+
+List<String> teamIndia = Arrays.asList("Virat", "Dhoni", "Jadeja");
+List<String> teamAustralia = Arrays.asList("Warner", "Watson", "Smith");
+List<List<String>> playersInWorldCup2016 = new ArrayList<>();
+playersInWorldCup2016.add(teamIndia);
+playersInWorldCup2016.add(teamAustralia);
+List<String> listOfAllPlayers = new ArrayList<>();
+for(List<String> team : playersInWorldCup2016) {
+  for(String name : team){
+    listOfAllPlayers.add(name);
+  }
+}
+
+flatMap使用：
+// Now let's do this in Java 8 using FlatMap
+List<String> flatMapList = playersInWorldCup2016.stream() .flatMap(pList -> pList.stream()) .collect(Collectors.toList())
+
+
+
+
+非空判断：
+List<AttendanceScheduleBO> attendanceScheduleBOS = scheduleBOListDateMap.get(dateString).stream().filter(bo -> Objects.nonNull(bo.getWorkHours())).collect(Collectors.toList());
+
+匹配到第一个枚举值就返回：findFirst()；
+SearchSkuBO skuBO = skuBOList.stream().filter(e -> e.getSkuId() == skuBo.getSkuId()).findFirst().orElse(null);
+匹配到某一个枚举值返回： findAny();
+匹配任何一个则返回Ture: anyMatch();
+Boolean result = skuBOList.stream().anyMatch(e -> e.getSkuId() == skuBo.getSkuId());
+匹配到所有才返回Ture： allMatch();
+Boolean result = skuBOList.stream().allMatch(e -> e.getSkuId() == skuBo.getSkuId());
+
+Optional非空处理：
+Integer type = null;
+type = ofNullable( type ).orElse( 0 );
+
+List<Integer> list ....
+Optional.ofNullable(list).orElse(emptyList());
+List<ShopBo> shopBoList = Optional.ofNullable(manageShopResult.getResult()).orElse(Collections.emptyList());
+判定那个抛出Npe
+
+Objects.requireNonNull(xxxx);
+String safeKey = Objects.requireNonNull(key, "Key is null"); "后面是message";
+
+综合使用：
+List<CheckOrderVO> checkOrderVOS = Optional.ofNullable(stockCheckOrderBOPageInfo.getList()).orElse(Collections.emptyList()).stream().map(stockCheckOrderBO -> {
+              CheckOrderVO checkOrderVO = new CheckOrderVO();
+              BeanUtils.copyProperties(stockCheckOrderBO, checkOrderVO);
+              checkOrderVO.setOrderCode(stockCheckOrderBO.getCode());
+              checkOrderVO.setOrderStatus(stockCheckOrderBO.getStatus());
+              checkOrderVO.setStoreName(stockCheckOrderBO.getShopName());
+              checkOrderVO.setCreateTime(stockCheckOrderBO.getCreateTime());
+              return checkOrderVO;
+          }).collect(Collectors.toList());
+
+
+peek 先做预处理再进行流:
+eg: list.stream().peek(bo -> {
+    bo.setShopName(shopNameMap.get(bo.getShopId()));
+                        }).collect(Collectors.toList());
+eg: statisticsWeekBO.setWeekData(weekBos.stream().peek(StoreStatisticDataUtils::calAllMetrics).collect(Collectors.toList()));
+
+public static void calAllMetrics(StatisticsDataBO bo) {
+    bo.setShoppingPoints(StoreStatisticDataUtils.calShoppingPoints(bo));
+    bo.setPerCustomerTransaction(StoreStatisticDataUtils.calPerCustomerTransaction(bo));
+    bo.setScrapRate(StoreStatisticDataUtils.calScrapRate(bo));
+    bo.setSaleMoneyExcludeRefundMoney(calSaleMoneyExcludeRefundMoney(bo));
+}
+
+
+
+
 sql:
 SELECT  `merch_id`, sum(count), `adjustment_reason`,  `create_time`
 FROM `store_sku_stock_optlog`
@@ -338,3 +456,115 @@ where `shop_id` = 50 and `merch_id` = 2310 GROUP BY `create_time` , `adjustment_
 8.2 Lion配置
 KEY:
 List<Integer> days = Lion.getList("store-commodity-service.sku.expire.remind.days", Integer.class);
+
+8.3 chomd
+http://www.runoob.com/linux/linux-comm-chmod.html
+chomd abc file // chomd 777 fileName
+scp 复制文件和目录
+
+8.8
+修改成ONEWAY:
+
+InvokerConfig<SkuExpireDataJobService> invokerConfig =
+                new InvokerConfig<>("http://service.owitho.com/retail/storeService/SkuExpireDataJobService_2.0.0", SkuExpireDataJobService.class);
+
+invokerConfig.setCallType(CallMethod.ONEWAY.getName());
+SkuExpireDataJobService skuExpireDataJobService = ServiceFactory.getService(invokerConfig);
+
+8.17:
+List只允许添加一个元素
+List<String> singList = Collections.singletonList(new String("fe"));
+
+8.23
+Integer 和 int 比较
+Integer int 比较 Integer 拆箱
+Integer Integer == 比较地址 。equals 比较值 不过 -128 ~ 127 会自动拆箱
+
+
+9.14
+HashBaseTable用法：
+Table<Integer, Integer, List<SkuPO>> shopMerchIdMap = HashBasedTable.create();
+        R        C          V
+contains(Object rowKey, Object columnKey)
+containsColumn
+containsRow
+values --> public Collection<V> values()
+eg:storeHourData.row(req.getDayId()).values()
+                .stream().sorted(Comparator.comparing(StatisticsDataBO::getHourId)).collect(Collectors.toList())
+
+去mybatis 搂数据 不会返null 只会返一个长度为0的空
+
+9.17
+https://www.cnblogs.com/igoodful/p/9517784.html
+Sorted():
+list.stream().sorted();
+list.stream().sorted(Comparator.reverseOrder)
+使用Comparator 来排序一个list
+list.stream().sorted(Comparator.comparing(Student::getAge))
+list.stream().sorted(Comparator.comparing(Student::getAge).reversed())
+组合比较：
+humans.sort(Comparator.comparing(Human::getName).thenComparing(Human::getAge));
+
+
+当然还可以不用借助steam方式直接排序：
+list.sort(Comparator.comparing(Integer::intValue));
+list.sort(Comparator.comparing(Integer::intValue).reversed());
+list.sort(Comparator.comparing(Student::getAge));
+list.sort(Comparator.comparing(Student::getAge).reversed());
+
+如果用null过滤：
+Comparator.comparing(Person::getMiddleName(), Comparator.nullsFirst(...))
+
+eg:
+Comparator<Student> comparator = Comparator.comparing(Student::getAge,
+            Comparator.nullsLast(Comparator.reverseOrder()));
+    Collections.sort(list, comparator);
+    list.stream().forEach(n -> System.out.println(n.toString()));
+
+eg:
+statisticsDTO.setHourData(storeHourData.row(req.getDayId()).values()
+                .stream().sorted(Comparator.comparing(StatisticsDataBO::getHourId)).collect(Collectors.toList()));
+
+monitorData = monitorData.stream().peek(bo -> {
+                            bo.calPurchaseCount();
+                            bo.calOweRate();
+                            SkuStockReportUtils.addBOToBO(bo, allStockData);
+                        }).sorted(Comparator.comparing(StockMonitorBO::getOweRate, Comparator.nullsFirst(BigDecimal::compareTo)).reversed()).collect(Collectors.toList());
+
+
+
+
+
+                        checkPlanDetails.forEach(e -> {
+                               if (e.getDivId() != null) {
+                                   divIds.add(e.getDivId());
+                               }
+                               if (e.getDeptId() != null) {
+                                   deptIds.add(e.getDeptId());
+                               }
+                               if (e.getClassId() != null) {
+                                   classIds.add(e.getClassId());
+                               }
+                               if (e.getSubclassId() != null) {
+                                   subclassIds.add(e.getSubclassId());
+                               }
+                           });
+10-11:
+BigDecimal:
+取绝对值：
+BigDecimal diff = new BigDecimal(initCheck - initShouldStock).abs();
+
+除法：
+BigDecimal asd = diff.divide(div,4,RoundingMode.HALF_UP);
+
+10-19：
+Pair：
+Pair<Integer, String> pair = new Pair<>(1, "One");
+Apache 的 ：
+Pair<Integer, Integer> pairValue = Pair.of(1,10);
+pairValue.getLeft();  pairValue.getValue();
+
+
+Properties props = new Properties();
+KafkaConsumer<String,String> consumer = new KafkaConsumer<>(props);
+java.util.Map<TopicPartition,OffsetAndTimestamp> partitionTimestampOffsets = consumer.offsetsForTimes(java.util.Map<TopicPartition,java.lang.Long>)

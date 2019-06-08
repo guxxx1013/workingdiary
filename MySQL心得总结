@@ -12,6 +12,8 @@ ALTER TABLE ls_paycenter_order AUTO_INCREMENT = 25000000
 
 MySQL 常用查询语句：
 select * from `ls_pct_prepayorder` WHERE  `mq_biz_notify_status` = 10 and `update_time` <= '2018-01-18 21:00:00' and `update_time` >= '2018-01-18 20:00:00'
+SELECT * FROM kylin_store.`store_sku_stock_report_data`  库名 + 表名
+OrderBy: SELECT * FROM `store_sku_stock_report_data` where `shop_id` =21 and `merch_id` =100 order by `record_date`  DESC
 
 3.
 建表：
@@ -51,3 +53,27 @@ and date = DATE_FORMAT(#{date},'%Y-%m-%d')
 </if>
 
 6.Sql添加字段
+alter table `store_sku_stock_report_data` add `rack_pick_count` int(11) DEFAULT '0'
+alter table `store_sku_chech_stock_detail` add `need_recheck` tinyint(4) NOT NULL DEFAULT '0' COMMENT '是否需要强制复盘 0不需要 1需要'
+
+
+
+7.模糊查询：
+<if test="request.code != null">
+  AND code LIKE CONCAT('%', #{request.code}, '%')
+</if>
+
+8.Join用法
+https://blog.csdn.net/u014433030/article/details/66975177
+以左表为准所有
+select * from A
+left join B
+on A.id = b.id
+以右表为准所有
+select * from A
+right join B
+on A.id = b.id
+取交集
+select * from A
+join B
+on A.id = b.id

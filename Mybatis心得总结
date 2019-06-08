@@ -76,7 +76,6 @@ resultMap设计java对应变量名和数据库中的数据一一对应。
         SELECT * FROM user
     </select>
 
-
 <!--
     <select id = "getAllUsers" resultType="com.gu.spring.mybatis.vo.User">
         SELECT * FROM user
@@ -84,7 +83,6 @@ resultMap设计java对应变量名和数据库中的数据一一对应。
 -->
 
 </mapper>
-
 
 <sql id="selectSql">
     SELECT
@@ -107,7 +105,7 @@ resultMap设计java对应变量名和数据库中的数据一一对应。
 </select>
 
 
-2.selectkey的用法：???
+2.selectkey的用法：(insert完的id 不是作为return值 而是直接赋值到PO上面)
 http://blog.csdn.net/xu1916659422/article/details/77921912
 
 <![CDATA[ AND total_pay_money >= (refund_frozen_amount + refund_amount + #{refundFrozenAmount}) ]]>
@@ -169,9 +167,9 @@ https://www.cnblogs.com/qiankun-site/p/5758924.html
 
 trim标记是一个格式化的标记，可以完成set或者是where标记的功能
 select * from user
-　　<trim prefix="WHERE" prefixoverride="AND |OR">
-　　　　<if test="name != null and name.length()>0"> AND name=#{name}</if>
-　　　　<if test="gender != null and gender.length()>0"> AND gender=#{gender}</if>
+　　<trim prefix="WHERE" prefixoverride="AND | OR">
+　　　　<if test="name != null and name.length() > 0"> AND name=#{name}</if>
+　　　　<if test="gender != null and gender.length() > 0"> AND gender=#{gender}</if>
 　　</trim
 
 update user
@@ -283,3 +281,38 @@ name like CONCAT('%','莲','%')
  </sql>
 
  11.group by:
+
+
+ 12.逆向生成工具：
+ https://www.v2ex.com/t/38076
+ https://www.aliyun.com/jiaocheng/778203.html
+ insert
+ insertSelective
+ insertList
+ update
+ delete
+ find
+ findById
+ findAgeById
+ findByIdIn
+ findByUserName
+ findByAgeGreaterThanAndIdLessThan
+ findDistinctUserNameOrderByGlobalIdDesc
+ findByAgeGreaterThanOrIdLessThan
+ countByIdBetween
+ findByIdGreaterThanOrEqualTo
+ findByIdLessThanOrEqualTo
+ findByIdBetweenOrEqualTo
+ count
+ findDistinctUserName
+ deleteById
+ deleteByIdBetween
+ findByIdBetween
+ countDistinctUserNameByAgeLessThan
+ findFirstByuserName
+ findDistinctUserNameIn
+ findByAgeOrderByUserNameDesc
+ findByIdInAndUserNameIn
+ updateUserNameById
+ updateUserNameAndPasswordByIdBetween
+ findMaxIdAndMinId

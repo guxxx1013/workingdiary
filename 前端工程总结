@@ -25,6 +25,9 @@ npm run build；
 数据库修改自增顺讯
 ALTER TABLE table_name AUTO_INCREMENT = 1;
 
+ALTER TABLE store_check_plan_recheck_rule_sku AUTO_INCREMENT = 1;
+
+
 pay-oss-web:(web层 工程文件)：
 1.PayModeManageVO  ---> VO显示层
 2.PayModeManageController ---> 利用controller，通过跳转ftl文件， 然后通过跳转的页面文件再反过来调用controller。

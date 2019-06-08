@@ -1866,7 +1866,6 @@ store-data SkuStockReportDataServiceImpl.getInsufficientDetail
 生产日期 效期 加上去 主档 保质期带过来
 
 production_date
-
 shelf_lift_count
 shelfLiftCount
 
@@ -1876,10 +1875,403 @@ expire_date
 1为 生产日期
 2为 到期日期
 
-
-
 计算在里面计算效期
 http://localhost:8080/ajax/commoditymanage/modifyexpiredate
 
-
 push 其他
+neo ssh -e beta -t 10.0.16.1
+
+scp -F ~/.neo/ssh_config/beta_sh_ali_config /Users/quanjugu/Desktop/working/BmainCode/MileStone3/store-jobs/shop-sku-expire-job/target/shopskuexpire.zip cc:/tmp/
+./neo ssh -e beta
+sudo scp /tmp//shopskuexpire.zip root@172.19.24.143:/app/jarfiles/store/expire
+
+store server
+
+int count = shopSkuLocalService.updateBookById(req.getShopSkuId(), req.isBook(), req.getOperateUser());
+    if (count <= 0){
+        return ResponseBuilder.fail(ResponseEnum.SERVER_ERROR);
+    }
+
+涉及工程： beehive-server store-commodity store-jobs store-pda-web
+
+<select id="listByShopIdAndMerchIds" resultMap="BaseResultMap">
+    SELECT
+    <include refid="BaseColumnList"/>
+    FROM store_shop_sku
+    WHERE valid = 1 AND shop_id = #{shopId} AND merch_id IN
+    <foreach collection="merchIds" item="item" open="(" separator="," close=")">
+        #{item}
+    </foreach>
+</select>
+
+import com.lingshou.beehive.user.service.MercuryUserOperateService;
+import com.lingshou.beehive.user.dto.MercuryUserDTO;
+import com.lingshou.beehive.base.request.OperateRequest;
+
+
+
+store-pda-web       UserCacheService
+.beehive.base.enums.ResponseEnum;
+
+String dateStr = date.format( DateTimeFormatter.ofPattern( "yyMMdd" ) );
+
+       TicketNoGeneratorPo po = this.ticketNoGeneratorMapper.findMax( type, shopId, dateStr );
+       int seq = po == null ? 0 : po.getSeq();
+       seq++;
+
+       String ticketNo = this.generate( type, shopId, dateStr, seq );
+
+       po = new TicketNoGeneratorPo();
+       po.setType( type );
+       po.setShopId( shopId );
+       po.setDate( dateStr );
+       po.setSeq( seq );
+       po.setTicketNo( ticketNo );
+       int cnt = this.ticketNoGeneratorMapper.add( po );
+       return ticketNo;
+
+
+
+
+       <select id="queryOrderById" resultType="com.lingshou.store.stock.organizationorder.po.OrganizationOrderJoinPO">
+       select
+         soso.`id` as id,
+         soso.`serial_number` as serial_number,
+         soso.`code` as code,
+         soso.`shop_id` as shop_id,
+         soso.`total_count` as total_count,
+         soso.`total_retail_price` as total_retail_price,
+         so.`phone` as phone,
+         soso.`create_time` as create_time,
+         so.`address` as address,
+         soso.`send_date` as send_date,
+         soso.`status` as status,
+         soso.`update_time` as update_time
+         from `store_organization_supply_order` soso LEFT JOIN `store_organization` so ON soso.organization_id = so.id
+           WHERE id = #{id}
+           AND valid = 1
+       </select
+
+curl -i -X POST 'http://aliv18.data.moji.com
+
+/whapi/json/alicityweather/limit'  -H 'Authorization:APPCODE 你自己的AppCode' --data 'cityId=2&token=27200005b3475f8b0e26428f9bfb13e9'
+
+
+1.添加check_detail 是否必盘 0.25
+2.re_check_table 和 re_check_table_detail * 3表设计 0.5天
+3.dao层 re_check_table 0.5天
+4.dao层 re_check_table_detail * 3 1天
+5.分类规则 设计 接口定义 0.5天
+6.获取可盘点商品接口 1天
+7.四级分类选择范围接口 0.5天
+8.添加商品接口 1天
+9.PDA界面 接口 0.5天
+
+
+h_sto_beehive beehive_info改蜂窝类型
+
+`kylin_store`.`store_check_plan_recheck_rule`
+id
+check_plan_id
+type
+value //decimal
+
+
+`valid` tinyint(4) NOT NULL DEFAULT '1',
+`create_by` varchar(45) NOT NULL,
+`create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+`update_by` varchar(45) DEFAULT NULL,
+`update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+
+CREATE TABLE `store_check_plan_recheck_rule` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键id 自增',
+  `check_plan_id` int(11) NOT NULL COMMENT '计划id',
+  `type` int(11) DEFAULT NULL COMMENT '规则类型',
+  `value` decimal(11,2) DEFAULT NULL COMMENT '设定值',
+  `valid` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否有效 0无效 1有效',
+  `create_by` varchar(45) NOT NULL DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(45) DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='复盘规则-抽象规则表';
+
+
+ `kylin_store`.`store_check_plan_recheck`
+ id
+ check_plan_id
+ div_id
+ dept_id
+ class_id
+ subclass_id
+
+
+ CREATE TABLE `store_check_plan_recheck` (
+   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键id 自增',
+   `check_plan_id` int(11) NOT NULL COMMENT '计划id',
+   `div_id` int(11) DEFAULT NULL COMMENT '一级分类',
+   `dept_id` int(11) DEFAULT NULL COMMENT '二级分类',
+   `class_id` int(11) DEFAULT NULL COMMENT '三级分类',
+   `subclass_id` int(11) DEFAULT NULL COMMENT '四级分类',
+   `valid` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否有效 0无效 1有效',
+   `create_by` varchar(45) NOT NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `update_by` varchar(45) DEFAULT NULL COMMENT '更新人',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   PRIMARY KEY (`id`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='复盘规则-分类规则表';
+
+ CREATE TABLE `kylin_store`.`store_check_plan_recheck` (
+   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键id 自增',
+   `check_plan_id` int(11) NOT NULL COMMENT '计划id',
+   `type` int(11) DEFAULT NULL COMMENT '规则类型 1抽象 2分类 3商品',
+   `valid` tinyint(4) NOT NULL DEFAULT '1' COMMENT '是否有效 0无效 1有效',
+   `create_by` varchar(45) NOT NULL DEFAULT '' COMMENT '创建者',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `update_by` varchar(45) DEFAULT NULL COMMENT '更新者',
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+   PRIMARY KEY (`id`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='复盘规则表';
+
+
+ private List<CheckPlanDetailPO> buildAddCheckPlanDetailPOList(List<Integer> checkPlanIds, List<CheckPlanDetailBO> checkPlanDetailBOS, String operateUser) {
+     List<CheckPlanDetailPO> checkPlanDetailPOS = Lists.newArrayList();
+     for (Integer checkPlanId : checkPlanIds) {
+         for (CheckPlanDetailBO bo : checkPlanDetailBOS) {
+             checkPlanDetailPOS.add(buildAddCheckPlanDetailPO(checkPlanId, bo, operateUser));
+         }
+     }
+     return checkPlanDetailPOS;
+ }
+
+ //盘点复盘计划
+      //添加抽象规则
+
+
+
+      @Override
+          public List<CheckPlanDetailBO> listCheckPlanRange(Integer planId) throws QueryCategoryException {
+              List<CheckPlanDetailPO> checkPlanDetails = checkPlanLocalService.findDetailByPlanId(planId);
+              INFO_LOGGER.info("check range: " + checkPlanDetails);
+              if (CollectionUtils.isEmpty(checkPlanDetails)) {
+                  return Lists.newArrayList();
+              }
+              List<Integer> divIds = Lists.newArrayList();
+              List<Integer> deptIds = Lists.newArrayList();
+              List<Integer> classIds = Lists.newArrayList();
+              List<Integer> subclassIds = Lists.newArrayList();
+              checkPlanDetails.forEach(e -> {
+                  if (e.getDivId() != null) {
+                      divIds.add(e.getDivId());
+                  }
+                  if (e.getDeptId() != null) {
+                      deptIds.add(e.getDeptId());
+                  }
+                  if (e.getClassId() != null) {
+                      classIds.add(e.getClassId());
+                  }
+                  if (e.getSubclassId() != null) {
+                      subclassIds.add(e.getSubclassId());
+                  }
+              });
+              Map<Integer, String> divIdNameMap = getCategoryName(1, divIds);
+              Map<Integer, String> deptIdNameMap = getCategoryName(2, deptIds);
+              Map<Integer, String> classIdNameMap = getCategoryName(3, classIds);
+              Map<Integer, String> subclassIdNameMap = getCategoryName(4, subclassIds);
+              List<CheckPlanDetailBO> checkPlanDetailBOS = Lists.newArrayList();
+              checkPlanDetails.forEach(e -> {
+
+                  CheckPlanDetailBO bo = BeanCopyUtil.copy(e, CheckPlanDetailBO.class);
+                  bo.setDivName(divIdNameMap.getOrDefault(bo.getDivId(), null));
+                  bo.setDeptName(deptIdNameMap.getOrDefault(bo.getDeptId(), null));
+                  bo.setClassName(classIdNameMap.getOrDefault(bo.getClassId(), null));
+                  bo.setSubclassName(subclassIdNameMap.getOrDefault(bo.getSubclassId(), null));
+                  checkPlanDetailBOS.add(bo);
+              });
+              return checkPlanDetailBOS;
+          }
+
+
+      //OCT-10
+      单品盘点
+
+      shopSku 库存数据 shopskutemple 生成模板 optlog 库存变动
+     全部商品 -> 删掉 -> merchId -> skucode -> 二维码
+
+
+修改接口：
+https://nei.netease.com/interface/detail/res/?pid=18398&id=129182
+organizationOrderVO 新增 pickBy字段 和 状态多一个40 拣货中
+
+新增接口：
+https://nei.netease.com/interface/detail/res/?pid=18398&id=146913
+企业订单拣货详情页
+
+https://nei.netease.com/interface/detail/?pid=18398&id=146953
+企业订单单品拣货暂存
+
+https://nei.netease.com/interface/detail/req/?pid=18398&id=146975
+企业订单拣货完成接口
+
+
+//生成炼货详情表
+  List<OrganizationPickOrderDetailPO> organizationPickOrderDetailPOList = new ArrayList<>();
+  for (OrganizationSupplyOrderDetailPO organizationSupplyOrderDetailPO : organizationSupplyOrderDetailPOList) {
+      OrganizationPickOrderDetailPO organizationPickOrderDetailPO = new OrganizationPickOrderDetailPO();
+      organizationPickOrderDetailPO.setOrderId(pickOrderId);
+      organizationPickOrderDetailPO.setMerchId(organizationSupplyOrderDetailPO.getMerchId());
+      organizationPickOrderDetailPO.setExpectPickCount(organizationSupplyOrderDetailPO.getOrderCount());
+      //实际拣货数默认赋值
+//                organizationPickOrderDetailPO.setActualPickCount(0);
+      organizationPickOrderDetailPO.setPurchasePrice(organizationSupplyOrderDetailPO.getPurchasePrice());
+      organizationPickOrderDetailPO.setRetailPrice(organizationSupplyOrderDetailPO.getRetailPrice());
+      organizationPickOrderDetailPO.setValid(1);
+      organizationPickOrderDetailPO.setCreateBy(req.getPickBy());
+      organizationPickOrderDetailPOList.add(organizationPickOrderDetailPO);
+  } 6501
+
+
+
+
+  private List<StockBranchDataBO> generateBoData(List<StockDataBO> stockDataBOList, String minDate, String maxDate,
+                                                     Map<Integer, Integer> stockCurStockMap) {
+          List<StockBranchDataBO> result = new ArrayList<>();
+
+          Map<Integer, List<StockDataBO>> stockDataBOMap = stockDataBOList.stream().collect(Collectors.groupingBy(StockDataBO::getShopId));
+          stockDataBOMap.forEach((shopId, list) -> {
+              StockBranchDataBO stockBranchDataBO = new StockBranchDataBO();
+              stockBranchDataBO.setShopId(shopId);
+              int beginStock = 0, endStock = 0, realSaleCount = 0, purchaseCount = 0, refundCount = 0, scrapCount = 0,
+                      checkCount = 0, userRefundCount = 0, allocationCount = 0, oweCount = 0, rackPickCount = 0, rackRejectCount = 0
+                      , enterprisePickCount = 0, enterpriseRejectCount = 0, exchangeCount = 0;
+              String shopName = "";
+              for (StockDataBO stockDataBO : list) {
+                  if (stockDataBO.getRecordDate().equals(minDate)) {
+                      beginStock += stockDataBO.getTodayStock();
+                  }
+                  if (stockDataBO.getRecordDate().equals(maxDate)) {
+                      endStock += stockDataBO.getTodayStock() + stockDataBO.getPurchaseCount() + stockDataBO.getRealSaleCount()
+                              + stockDataBO.getRefundCount() + stockDataBO.getScrapCount() + stockDataBO.getCheckCount()
+                              + stockDataBO.getAllocation() + stockDataBO.getOweCount() + stockDataBO.getRackPickCount()
+                              + stockDataBO.getrackRejectCount() + stockDataBO.getEnterprisePickCount()
+                              + stockDataBO.getEnterpriseRejectCount() + stockDataBO.getExchangeCount();
+                  }
+                  purchaseCount += stockDataBO.getPurchaseCount();
+                  realSaleCount += stockDataBO.getRealSaleCount();
+                  refundCount += stockDataBO.getRefundCount();
+                  scrapCount += stockDataBO.getScrapCount();
+                  checkCount += stockDataBO.getCheckCount();
+                  userRefundCount += stockDataBO.getUserRefundCount();
+                  allocationCount += stockDataBO.getAllocation();
+                  oweCount += stockDataBO.getOweCount();
+                  rackPickCount += stockDataBO.getRackPickCount();
+                  rackRejectCount += stockDataBO.getrackRejectCount();
+                  enterprisePickCount += stockDataBO.getEnterprisePickCount();
+                  enterpriseRejectCount += stockDataBO.getEnterpriseRejectCount();
+                  exchangeCount += stockDataBO.getExchangeCount();
+                  shopName = stockDataBO.getShopName();
+              }
+              stockBranchDataBO.setBeginStock(beginStock).setEndStock(endStock).setOweCount(oweCount)
+                      .setPurchaseCount(purchaseCount).setSaleCount(realSaleCount).setUserRefundCount(userRefundCount)
+                      .setRefundCount(refundCount).setScrapCount(scrapCount).setCheckCount(checkCount).setAllocationCount(allocationCount);
+              stockBranchDataBO.setShouldStock(beginStock + purchaseCount + realSaleCount + refundCount + userRefundCount
+                      + allocationCount + oweCount + rackPickCount + rackRejectCount + enterprisePickCount + enterpriseRejectCount + exchangeCount)
+                      .setRackPickCount(rackPickCount).setrackRejectCount(rackRejectCount);
+              stockBranchDataBO.setEnterprisePickCount(enterprisePickCount);
+              stockBranchDataBO.setEnterpriseRejectCount(enterpriseRejectCount);
+              stockBranchDataBO.setExchangeCount(exchangeCount);
+              if (stockCurStockMap.containsKey(shopId)) {
+                  stockBranchDataBO.setCurStock(stockCurStockMap.get(shopId));
+              }
+              stockBranchDataBO.setShopName(shopName);
+              result.add(stockBranchDataBO);
+          });
+          return result;
+      }
+
+
+{"prepayNo":"20180529200807XLS0000000EVVHNKZ", "payModeId":11}
+{"shopTemplateIds":1}
+
+增:{"groupFileMappingManageDTO":{"groupId":25,"fileId":32}}
+改：{"req":{}}
+查询: {"id":1, "groupId":25}
+{"fileId":32}
+
+
+
+{"req":{}}
+{"req":{"name":"初始测试模板"}}
+
+private String name;
+   private String city;
+   private Integer label;
+   private Integer type;
+
+
+   public static void main(String[] args) {
+    QueryShopTemplateDataReq req = new QueryShopTemplateDataReq();
+    req.setName("abcdefg");
+    System.out.println(JSON.toJSONString(req));
+
+    System.out.println(JSON.toJSONString(Lists.newArrayList(1)));
+}
+
+{"name":"贝多芬店 王店模块（20个货架）"}
+{"name":"初始测试模板"}
+{"name":"初始测试模板"}
+{"name":"初始测试模板"}
+
+
+
+CREATE TABLE h_sto_commodity.`store_shop_rack_template` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `shop_temp_id` int(11) DEFAULT '0' COMMENT '门店模版id',
+  `rack_equip_id` int(11) NOT NULL COMMENT '货架设备id',
+  `normal_rack_id` int(11) DEFAULT NULL COMMENT '标准货架id',
+  `name` varchar(50) DEFAULT NULL COMMENT '货架名字',
+  `status` int(11) DEFAULT '0' COMMENT '状态 -1 删除 10 正常 20 停用',
+  `valid` tinyint(4) DEFAULT '1',
+  `create_time` datetime NOT NULL,
+  `update_time` datetime NOT NULL,
+  `create_by` varchar(25) NOT NULL,
+  `update_by` varchar(25) NOT NULL,
+  `sub_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '架中架标志',
+  `view_id` varchar(32) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IX_UPDATE_TIME` (`update_time`),
+  KEY `IX_SHOP_TEMP_ID` (`shop_temp_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='货架表';
+
+INSERT INTO h_sto_commodity.store_shop_rack_template SELECT * FROM kylin_store.store_shop_rack_template;
+
+
+
+CREATE TABLE h_sto_commodity.`store_rack_equip` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `code` varchar(25) DEFAULT NULL COMMENT '设备编码',
+  `name` varchar(25) DEFAULT NULL COMMENT '设备名称',
+  `type` int(11) DEFAULT '0' COMMENT '设备类型\n10 立式盒饭柜／ 20 工作台冰箱(冷冻)／21 三尺风幕柜／22 六尺风幕柜／23 中岛柜／ 24 3尺双温柜 ／25 风冷展示柜 ／ 26 标准开放式货架 ／27 虚拟货架  ／28  蒸包机／29 关东煮锅／30 FF冷热一体柜／31 热厨陈列柜 ／32 冷冻柜上柜 ／ 33 冷冻卧柜',
+  `brand` varchar(25) DEFAULT NULL COMMENT '设备品牌',
+  `supplier` varchar(25) DEFAULT NULL COMMENT '设备供应商',
+  `total_hang` int(11) DEFAULT '0' COMMENT '行',
+  `total_row` int(11) DEFAULT '0' COMMENT '挂层',
+  `total_col` int(11) DEFAULT '0' COMMENT '列',
+  `width` int(11) DEFAULT '0' COMMENT '长',
+  `status` int(11) DEFAULT '0' COMMENT '-1表示删除 其余正常',
+  `valid` tinyint(4) DEFAULT '1',
+  `create_time` datetime NOT NULL,
+  `update_time` datetime NOT NULL,
+  `create_by` varchar(25) NOT NULL,
+  `update_by` varchar(25) NOT NULL,
+  `sub_flag` tinyint(4) NOT NULL DEFAULT '0' COMMENT '架中架标志',
+  PRIMARY KEY (`id`),
+  KEY `IX_UPDATE_TIME` (`update_time`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='货架设备表';
+
+INSERT INTO h_sto_commodity.store_rack_equip SELECT * FROM kylin_store.store_rack_equip;
+
+/Users/quanjugu/Desktop/working/BmainCode/Master/store-commodity/store-commodity-service/src/main/resources/config/sqlmap/templaterackdata
+
+/Users/quanjugu/Desktop/working/BmainCode/Master/store-commodity/store-commodity-service/src/main/java/com/lingshou/store/commodity/templaterackdata/mapper

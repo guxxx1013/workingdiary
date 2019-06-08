@@ -62,6 +62,9 @@ throw new ServiceException("query stock opt log fail!");
 
 merchId + shopId 相当于key  -->   skuId
 
+Collections.emptyList()
+
+
 问题：store_sku_stock 更新时间
 
 造数据：
@@ -89,23 +92,393 @@ store_sku_check_stock_detail
 
 OMS 供应链
 
-订货：
-可进行多次订货： 早上 8：00 进行 可乐 +1 提交 下午2：00 进行 可乐 +2 提交 供应链 16：00 拒绝接单 然后 16：03
+订货：(sdo)
+可进行多次订货： 早上 8：00 进行 可乐 +1 提交 下午2：00 进行 可乐 +2 提交 供应链 16：00 拒绝接单 然后 16：03 追加订单16：00后 相当于16：00提交订单
 起订---最小数   步长：2(每次+2) 最大订货数：最大订货
+蜂窝订货
+1.https://store-pda.owitho.intra.im/ajax/pda/purchase/getorderskulist 查询列表 (查询条件：四级分类、商品名称：commodityName commodityCode(错误名字) 商品条形码)
+1.https://store-pda.owitho.intra.im/ajax/pda/purchase/getorderskudetail 查询单品
+2.https://store-pda.owitho.intra.im/ajax/pda/purchase/saveorderskulist 提交订单
+input:{"type":0,"shopOrderSkuVOS":[{"skuId":3016,"orderCount":21,"shopSkuId":21564}],"rackOrderSkuVOS":[{"skuId":3016,"orderCount":21,"shopSkuId":21564}]}
+output: success or fail
+a.根据shopId 自订类型(自订 直订 追加订货) 查询出是否在可订货时间范围
+b.根据input拼凑SaveOrderSkuReq进行数据库数据更新
+  --更新表逻辑 1.根据shopId orderType（Shop/Rack）ordeDate target 去Beehive_sdo查询
+                --有直接进入3 无新增 进入2
+             2.根据ShopId 去Beehive_Info查询基础信息(Id ShopId orderType target(门店/货架) orderDate) 拼接AddSdoReq新增 Beehive_sdo 返回
+             3.根据Beehive_sdo表中 id(sdo_id) 查询 Beehive_sdo_detail（1：n）以ShopSkuId 分类
+              对于每一组input数据，根据shopSkuId 去Beehive_sdo_detail是否有数据 有更新 无 添加（批量插入）关键字段ordrerCount 一比订货单 多比商品 一对多关系
+             4.同步商品实时推送至供应链 获取store_sdo（哪里更新的？推送？） 返回id(store_sdo_id) // 74 SupplyOperateServicImpl
+             5.更新beehive_sdo 表中ShopSdoId
+3.https://store-pda.owitho.intra.im/ajax/pda/purchase/getordercountandmoney 弹出金额
+问题：订货单sdo sdoDetail 多张 每次更新都会有一张？ 一对多
+CategoryPO ShopCategoryConfigPO CategoryShopSellTimePO
+
+蜂窝订货主流程：
+store-pda-web(beehive-pda-web 已弃用) --> beehive-stock --> store-commodity
+查询订货列表：
 
 验货：
+store-pda-web --> store-stock -->store-commodity
+配送单：
 无单验货：有些货没有定，但也送过来了，这时候需要进行无单验货
 有单验货：
 
+1.https://store-pda.owitho.intra.im/pda/commodity/getmerchId/{barcode} store-pda-web -> store-commodity
+扫码根据barCode 获取 marchId
+2.https://store-pda.owitho.intra.im/ajax/inspection/examineCargoInfo/{merchId}
+根据商品条形码获取配送单
+  a.根据shopId merchId 查询store_shop表 根据shopSkuId 查store_shop_sku中所以符合的数据， 去主档根据skuIdList 和 city 查出所以Price信息
+    去store_stock_sku获取库存信息 查询category信息 拼凑skuDetailBO表 校验是否存在商品（是否在”模板”内）
+  b.根据merchId shopId 获取配送单
+    --根据shopId 从store_distribution_order查出所以需要验货或验货中的配送单 获取orderIds
+    --根据orderIds 和 skuId 从store_distribution_order_detail数据 （根据OrderId进行筛选）//筛选？
+    --查找到商品对应的配送单ID 返回DistributionOrderPO返回
+3.未找到 无单验货：store-pda-web -> store-stock
+https://store-pda.owitho.intra.im/ajax/inspection/nonOrderVerify/(skuId(名字取错 实际为barCode), orderId(无))
+   a.类似2a拼凑skuViewBO数据
+   b.AddVerifyOrderReq(distributionOrderId shopId shopSkuId skuId orderId)
+      1.无verifyOrderId(OrderId 为空 必为空) 到Store_verify_order 中创建验货单(调用 shopId) 存入 store_verify_order并获取verifyOrderId
+      2.根据verifyOrderId SkuId ShopSkuId 1(count) 生成storeVerifyDetailPO 检验skuSimpleBO 获取 RetailPrice 插入 store_verify_detail
+      3.根据verifyOrderId 反查 StoreVerifyPO 反查 StoreVerifyDetailPO list（1：n）
+      4.返回verifyOrderBO 给前端展示数据
+4.更新数据修改验货数量
+https://store-pda.owitho.intra.im/ajax/inspection/update/(realityAmount(验收数量), skuCode, verifyId（4已拿到）, recordId（verify_order_detail id）, operateType 1:add 2:overwrite)
+有verify_order_detail的id更新verify_order_detail 中 receiveCount 的数据
+无id ：略未碰到具体情况
+
+5.提交验货：CompleteVerifyOrderReq(orderId shopId)
+https://store-pda.owitho.intra.im/ajax/inspection/submit/(verifyId(orderId)
+  1.根据检验是否在盘点，在盘点中拒绝更新--根据shopId获取shopPO.StockStatus()
+  2.根据orderId 查询store_verify_order 检验状态
+  3.根据orderId 查询store_verify_order_detail 数据信息（1：n） 计算totalCount totalPrice 更新 查询store_verify_order_detail数据
+  4.以前步骤为有单(配送单)验货 com/lingshou/store/stock/supply/service/impl/VerifyOrderServiceImpl.java:361
+
+欠货：
+1.查询欠货单(订货单号): orderId:（sdo_code）orderDate type：1 出产欠货 2 验货欠货)
+https://store-pda.owitho.intra.im/ajax/inspection/oweList
+  根据ShopId orderId orderDate Type 从 store_insufficient_order拿到欠货单数据
+2.通过storeInsufficientPO中的sdoCode 查询store_sdo 拿到订货单数据
+3.通过store_insufficient_order 和  查询store_sdo 拼凑数据返回前端。
+
 退货：
+store-pda-web --> store-stock
+              --> scm-commodity
+              --> store-oms
+1.退货日期 退货原因 扫描barCode 获取 marchId
+https://store-pda.owitho.intra.im/pda/commodity/getmerchId/{barcode}
+2.根据merchId 获取库存信息,主档商品信息，门店商品信息
+https://store-pda.owitho.intra.im/ajax/stockmanaged/scansku/{merchId}
+3.提交退货单：
+https://store-pda.owitho.intra.im/ajax/stockmanaged/submitrefundlist/ (storeId reason List<RejectCommodityVO> -- skuId shopSkuId rejectCount)
+    a.校验 是否有商品 数量是否大于0
+    b.RejectOrderReq(storeId, reason, status, commodityList退货单商品 )
+      1.查询ShopBo 检验是否在盘点中
+      2.根据RejectOrderReq 生成 RejectOrderPO 通过commodityList 获得skuIds， 拼接数据更新RejectOrderPO TotalCount, TotalPrice。
+      3.获取skustockpo 库存数据表 校验是否退货数小于当前库存
+      4.更新store_reject_order
+      5.根据Req,RejectOrderPO,rejectSkuBOS(退货) 组更新store_reject_order_detail
+      6.在oms中新增的退货单
+      7.更新库存信息
 
-配送：
+
+
+配送单：
+store-stock
 门店创建
-
+ToAddOpenReq: toCode sdoCode expectArrivalTime packageCount DistributionSkuDTOList
+1.根据sdoCode 获取 SdoPO
 
 主流程：
 <---OMS --->
 
 方法内部尽量不要包很多层
 
-问题：
+scp -F ~/.neo/ssh_config/beta_sh_ali_config /Users/quanjugu/Desktop/working/BmainCode/MileStone3/store-jobs/shop-sku-expire-job/target/shopskuexpire.zip cc:/tmp/
+./neo ssh -e beta
+sudo scp /tmp//shopskuexpire.zip root@172.19.24.143:/app/jarfiles/store/expire
+neo ssh -e beta -t 172.19.24.143
+
+
+
+scp -F ~/.neo/ssh_config/prod_sh_ali_config /Users/quanjugu/Desktop/working/BmainCode/MileStone3/store-jobs/shop-sku-expire-job/target/shopskuexpire.zip cc:/tmp/
+./neo ssh -e prod
+sudo scp /tmp/shopskuexpire.zip root@10.0.31.39:/app/jarfiles/store/expire/
+neo ssh -e prod -t 10.0.31.39
+
+scp -F ~/.neo/ssh_config/prod_sh_ali_config /Users/quanjugu/Desktop/working/BmainCode/Master/store-jobs/count-work-hours-job/target/workhours.zip cc:/tmp/
+./neo ssh -e prod
+sudo scp /tmp/workhours.zip root@10.0.31.39:/app/jarfiles/store/countworkhour/
+
+
+/app/jarfiles/store/countworkhour/workhours.job-1.0.0-SNAPSHOT.jar
+/app/jarfiles/store/att/attendance.job-1.0.0-SNAPSHOT.jar
+
+
+sql：
+增加效期字段
+ALTER TABLE `kylin_store`.`store_shop_sku`
+ADD COLUMN `production_date` date DEFAULT NULL COMMENT '生产日期',
+ADD COLUMN `shelf_life_count` int(11) DEFAULT NULL COMMENT '保质期',
+ADD COLUMN `expire_date` date DEFAULT NULL COMMENT '效期';
+
+
+MileStone4:
+1.SearchPurchaseReq 增加货架字段
+门店：
+https://store-pda.owitho.intra.im/ajax/purchase/getorderskudetail/3037?code=200001748001&skuId=3037&shopSkuId=22019&userId=3814&storeId=1
+蜂窝：
+https://store-pda.owitho.intra.im/ajax/pda/purchase/getorderskudetail?code=undefined&skuId=3011&shopSkuId=21561&userId=3814&storeId=1
+
+spi
+bootStrap 服务端 netty
+loadClass
+INTERN STRING
+
+beehive-stock ----货架功能
+store-stock ---14天数据
+store-pda-web-- 功能总
+
+MileStone5:
+1.创建企业订单数据库(enterprise_order) 定字段（？ 订单编号／配送日／门店／商品名称／商品编号／商品数量／企业名称／企业地址（null）／联系人(null)／手机号(null) 订单状态<待拣货 已拣货 已取消>  ）
+2.创建订单接口（根据字段 ？？？？）
+push接口（调用已有接口？candox）
+3.取消企业订单接口 （2 -> 置状态？status？ valid？）
+4.企业订单查询接口（订单编号、用户地址、订单状态）、排序）
+5.企业订单详情 --> 调用外卖C端拣货
+
+
+store-data：各种报表
+store-stock:各种单据 + 库存
+store-commodity:商品
+store-service：基础服务
+
+
+CREATE TABLE `store_organization_supply_order` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键id 自增',
+  `code` varchar(50) NOT NULL DEFAULT '' COMMENT '订单编号',
+  `send_date` datetime DEFAULT NULL COMMENT '配送时间',
+  `shop_id` int(11) NOT NULL COMMENT '门店id',
+  `pick_order_id` bigint(20) NOT NULL COMMENT '拣货单id',
+  `organization_type` varchar(50) DEFAULT NULL COMMENT '机构类型(1 企业)',
+  `organization_name` varchar(50) DEFAULT NULL COMMENT '机构名称',
+  `organization_address` varchar(50) DEFAULT NULL COMMENT '机构地址',
+  `organization_contact` varchar(50) DEFAULT NULL COMMENT '机构联系人',
+  `phone` varchar(50) DEFAULT NULL COMMENT '手机号',
+  `status` int(11) NOT NULL DEFAULT '0' COMMENT '订单状态 0 待拣货 1已拣货 2已取消',
+  `valid` tinyint(11) NOT NULL DEFAULT '1' COMMENT '是否有效',
+  `create_by` varchar(50) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(50) DEFAULT NULL COMMENT '更新者',
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `IX_Pick_Order_Id` (`pick_order_id`),
+  KEY `IX_Create_Time` (`create_time`),
+  KEY `IX_Code` (`code`),
+  KEY `IX_Phone` (`phone`),
+  KEY `IX_Organization_Address` (`organization_address`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `store_organization` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键id 自增',
+  `organization_type` varchar(50) DEFAULT NULL COMMENT '机构类型(1 企业)',
+  `organization_name` varchar(50) DEFAULT NULL COMMENT '机构名称',
+  `organization_address` varchar(50) DEFAULT NULL COMMENT '机构地址',
+  `organization_contact` varchar(50) DEFAULT NULL COMMENT '机构联系人',
+  `phone` varchar(50) DEFAULT NULL COMMENT '手机号',
+  `valid` tinyint(11) NOT NULL DEFAULT '1' COMMENT '是否有效',
+  `create_by` varchar(50) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(50) DEFAULT NULL COMMENT '更新者',
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `IX_Create_Time` (`create_time`),
+  KEY `IX_Phone` (`phone`),
+  KEY `IX_Organization_Address` (`organization_address`),
+  KEY `IX_Organization_Contact` (`organization_contact`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `store_organization_supply_order_detail` (
+ `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键id 自增',
+ `order_id` bigint(20) NOT NULL COMMENT '企业订单id',
+ `merch_id` int(11) NOT NULL COMMENT '商品id',
+ `order_count` int(11) NOT NULL DEFAULT '0' COMMENT '订单数量',
+ `purchase_price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '进货价',
+ `retail_price` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '门店售价',
+ `valid` tinyint(11) NOT NULL DEFAULT '1' COMMENT '是否有效',
+ `create_by` varchar(50) DEFAULT NULL COMMENT '创建者',
+ `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+ `update_by` varchar(50) DEFAULT NULL COMMENT '更新者',
+ `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `IX_Order_Id` (`order_id`),
+  KEY `IX_Merch_Id` (`merch_id`),
+  KEY `IX_Create_Time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `store_organization_pick_order` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键id 自增',
+  `code` varchar(50) NOT NULL DEFAULT '' COMMENT '炼货单编号',
+  `organization_type` int(11) DEFAULT NULL COMMENT '机构类型(1 企业)',
+  `supply_code` varchar(50) NOT NULL DEFAULT '' COMMENT '订单编号',
+  `supply_order_id` bigint(20) NOT NULL COMMENT '订单id',
+  `shop_id` int(11) NOT NULL COMMENT '门店id',
+  `pick_by` varchar(50) DEFAULT NULL COMMENT '拣货人',
+  `complete_time` datetime DEFAULT NULL COMMENT '拣货完成时间 ',
+  `valid` tinyint(11) NOT NULL DEFAULT '1' COMMENT '是否有效',
+  `create_by` varchar(50) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(50) DEFAULT NULL COMMENT '更新者',
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `IX_Code` (`code`),
+  KEY `IX_Supply_Code` (`supply_code`),
+  KEY `IX_Supply_Order_Id` (`supply_order_id`),
+  KEY `IX_Complete_Time` (`complete_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `store_organization_pick_order_detail` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键id 自增',
+  `order_id` bigint(20) DEFAULT NULL COMMENT '拣货单id',
+  `merch_id` int(11) DEFAULT NULL COMMENT '商品id',
+  `expect_pick_count` int(11) DEFAULT NULL COMMENT '期望拣货数',
+  `actual_pick_count` int(11) DEFAULT NULL COMMENT '实际拣货数',
+  `valid` tinyint(11) NOT NULL DEFAULT '1' COMMENT '是否有效',
+  `create_by` varchar(50) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
+  `update_by` varchar(50) DEFAULT NULL COMMENT '更新者',
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `IX_Order_Id` (`order_id`),
+  KEY `IX_Merch_Id` (`merch_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+拣货 和 抠库存单独接口
+待做：
+1.spring 配置
+
+
+Map<Integer, SkuCommodityBO> skuCommodityBOMap = skuCommodityBOList.stream().collect(Collectors.toMap(SkuCommodityBO::getSkuId, skuCommodityBO -> skuCommodityBO));
+
+
+推送Job:
+
+scp -F ~/.neo/ssh_config/prod_sh_ali_config /Users/quanjugu/Desktop/working/BmainCode/MileStone5/store-jobs/delivery-day-enterprise-order-push-job/target/delivery.zip cc:/tmp/
+./neo ssh -e prod
+sudo scp /tmp/delivery.zip root@10.0.31.39:/app/jarfiles/store/deliveryorder/
+neo ssh -e prod -t 10.0.31.39
+
+scp -F ~/.neo/ssh_config/prod_sh_ali_config /Users/quanjugu/Desktop/working/BmainCode/MileStone5/store-jobs/shop-organization-order-push-job/target/organordernew.zip cc:/tmp/
+./neo ssh -e prod
+sudo scp /tmp/organordernew.zip root@10.0.31.39:/app/jarfiles/store/organizaitonorder/
+neo ssh -e prod -t 10.0.31.39
+
+SELECT * FROM `store_sku_stock_optlog` where `shop_id` = 28 and `merch_id` = 10 and `create_time` >= '2018-08-06' and '2018-08-06 23:59:59' > `create_time`  and `adjustment_type`  = 160
+
+SELECT sku.sku_code, spu.commodity_name, div_name, dept_name, class_name
+  , subclass_name, total_quantity AS '下单数量', pay_time AS '支付时间'
+FROM store_order.`store_order_item` orderSku
+  LEFT JOIN store_order.`store_order` storeOrder ON orderSku.order_id = storeOrder.id
+  LEFT JOIN kylin_store.store_shop_sku shopSku ON orderSku.sku_id = shopSku.id
+  LEFT JOIN h_scm_commodity.commodity_sku sku ON shopSku.merch_id = sku.id
+  LEFT JOIN h_scm_commodity.commodity_spu spu ON sku.spu_id = spu.id
+  LEFT JOIN h_scm_commodity.commodity_div comDiv ON spu.div_id = comDiv.id
+  LEFT JOIN h_scm_commodity.commodity_dept comDept ON spu.dept_id = comDept.id
+  LEFT JOIN h_scm_commodity.commodity_class comClass ON spu.class_id = comClass.id
+  LEFT JOIN h_scm_commodity.commodity_subclass comSubclass ON spu.subclass_id = comSubclass.id
+  WHERE comDiv.div_name = '快速食品'
+  AND comDept.dept_name = '包子'
+  AND pay_time >= '2018-08-01 00:00:00'
+  AND '2018-08-10 00:00:00' >= pay_time;
+
+SELECT sku_id FROM h_scm_tms.commodity_overall where sku_code = '200000003001'
+
+SELECT shop_id, merch_id, production_date, shelf_life_count, expire_date, sku.sku_code,
+FROM kylin_store.`store_shop_sku` shopSku
+LEFT JOIN h_scm_commodity.commodity_sku sku ON shopSku.merch_id = sku.id
+WHERE expire_date > 0;
+
+
+SELECT shop_id, production_date, shelf_life_count, expire_date, sku.sku_code,
+cDiv.div_name AS '一级分类', cDept.dept_name AS '二级分类', cClass.class_name AS '三级分类', cSubclass.subclass_name AS '四级分类'
+, spu.commodity_name AS '商品名称', sku.id AS 'sku_id', sku.sku_code AS 'sku_code'
+FROM kylin_store.`store_shop_sku` shopSku
+LEFT JOIN `h_scm_commodity`.`commodity_sku` sku ON shopSku.merch_id = sku.`id`
+LEFT JOIN `h_scm_commodity`.`commodity_spu` spu ON sku.spu_id = spu.`id`
+LEFT JOIN `h_scm_commodity`.commodity_div cDiv ON spu.div_id = cDiv.id
+LEFT JOIN `h_scm_commodity`.commodity_dept cDept ON spu.dept_id = cDept.id
+LEFT JOIN `h_scm_commodity`.commodity_class cClass ON spu.class_id = cClass.id
+LEFT JOIN `h_scm_commodity`.commodity_subclass cSubclass ON spu.subclass_id = cSubclass.id
+WHERE expire_date > 0;
+
+SELECT shop_id, shop.name,
+cDiv.div_name AS '一级分类', cDept.dept_name AS '二级分类', cClass.class_name AS '三级分类', cSubclass.subclass_name AS '四级分类'
+, spu.commodity_name AS '商品名称', sku.id AS 'sku_id', sku.sku_code AS 'sku_code'
+, production_date, shelf_life_count, expire_date
+FROM kylin_store.`store_shop_sku` shopSku
+LEFT JOIN `h_scm_commodity`.`commodity_sku` sku ON shopSku.merch_id = sku.`id`
+LEFT JOIN `h_scm_commodity`.`commodity_spu` spu ON sku.spu_id = spu.`id`
+LEFT JOIN `h_scm_commodity`.commodity_div cDiv ON spu.div_id = cDiv.id
+LEFT JOIN `h_scm_commodity`.commodity_dept cDept ON spu.dept_id = cDept.id
+LEFT JOIN `h_scm_commodity`.commodity_class cClass ON spu.class_id = cClass.id
+LEFT JOIN `h_scm_commodity`.commodity_subclass cSubclass ON spu.subclass_id = cSubclass.id
+LEFT JOIN kylin_store.store_shop shop ON shopSku.shop_id = shop.id
+WHERE expire_date > 0 AND shopSku.valid = 1 AND shop.test_shop = 0 and shop.online_status = 10;
+
+
+SELECT  shop.`name` AS '门店名称', shop.`id`AS '门店id',
+CASE
+    WHEN ord.`type` =1 THEN '出库欠货'
+    ELSE '验货欠货'
+END AS '欠货类型',
+det.`lack_count` AS '欠货数',
+distri.order_count AS '订货数量',
+distri.distributed_count AS '发货数量',
+det.`create_time` AS '创建时间',
+CONCAT(CONCAT(CURRENT_DATE, ' 00:00:00 - '), CURRENT_TIMESTAMP) AS '本次查询范围'
+FROM ods.`kylin_store__store_insufficient_order_detail` det
+LEFT JOIN ods.`kylin_store__store_insufficient_order` ord ON det.`order_id`  = ord.`id`
+LEFT JOIN ods.`kylin_store__store_shop` shop ON ord.`shop_id` = shop.`id`
+LEFT JOIN
+(SELECT ord.`sdo_id`, det.`sku_id` , det.`order_count` , det.distributed_count FROM `kylin_store`.`store_distribution_order_detail` det
+LEFT JOIN ods.`kylin_store__store_distribution_order` ord ON det.`order_id` = ord.`id` ) distri ON ord.`sdo_id` = distri.sdo_id AND det.`sku_id` = distri.sku_id
+WHERE det.`create_time` > CURRENT_DATE  ORDER BY shop.`id`
+
+
+
+10-11：
+
+添加额外商品 非门店商品验货流程：
+生成计划表->正常推单->删除对应商品->
+
+查询主档信息：
+kylin_scm --> commodity_overall
+
+
+盘点主流程梳理:
+主表：
+计划表：store_check_plan, store_check_plan_detail
+盘点单：store_sku_check_stock, store_sku_check_stock_detail
+
+盘点
+
+同一相似功能接口整理：
+
+4,8 1,11
+
+
+
+15
+
+
+2018-10-17 12:38:21
+
+
+store_shop_sku (门店商品表)
+store_sku_stock (门店库存表)
+store_category (前台类目)
+store_shop_category_config (分类配置表)
+store_category_shop_sell_time (分类可售时间配置)
+store_merch_div_category_ref (前后台类目映射)

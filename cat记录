@@ -1,3 +1,20 @@
+
+
+#####logout#####,no beehive access; userName:"13816628423",deviceId:i111111,shopId:1,user:{"beehiveList":[{"beehiveId":20,"beehiveName":"8号线上体验店蜂窝","
+error, JsonNotAllowedAccessException com.lingshou.store.pda.base.exception.json.JsonNotAllowedAccessException: 您没有本店权限！
+---
+线上8号店账号登陆1号店，没有权限，被剔了
+
+[sku_inner:com.owitho.arch.logger.LoggerManager:82] - sync shop sku error, when edit shop:28, sku:2875
+https://sc.owitho.com/scUpgrade
+https://wiki.owitho.com/pages/viewpage.action?pageId=16531090
+
+选店：28
+全量拉取商品信息接口：curl localhost:8000/ajax/commodity/load
+
+
+
+
 2018-05-21
 【LogScan报警】
 【主机名】: pay-cashier-service-2.sv.prod.alsh.xingbianli.com(10.0.36.57)
