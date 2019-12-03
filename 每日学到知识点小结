@@ -345,6 +345,9 @@ Collectors.toMap
 Map<Integer, Integer> stockCurStockMap = stockBOList.stream().collect(Collectors.toMap(StockBO::getShopId, StockBO::getCurStock));
 Map<Integer, SkuCommodityBO> map = skuCommodityBOS.stream().collect(Collectors.toMap(SkuCommodityBO::getSkuId, s -> s));
 
+steam().distinct:
+List<String> memberIdList = exchBrokers.stream().map(xxx -> xxx.getMemberId()).distinct().collect(Collectors.toList());
+
 stream().sorted:
 storeShopSkuStatisticsDataBOList = storeShopSkuStatisticsDataBOList.stream().sorted(Comparator.comparing(StoreShopSkuStatisticsDataBO::getShopId)).collect(toList());
 当有空指针情况处理:
