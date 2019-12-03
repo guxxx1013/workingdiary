@@ -568,3 +568,14 @@ pairValue.getLeft();  pairValue.getValue();
 Properties props = new Properties();
 KafkaConsumer<String,String> consumer = new KafkaConsumer<>(props);
 java.util.Map<TopicPartition,OffsetAndTimestamp> partitionTimestampOffsets = consumer.offsetsForTimes(java.util.Map<TopicPartition,java.lang.Long>)
+
+
+
+
+问同事工作后的第一反应； done
+回家都不问； done
+830回家 不说辛苦了 拆干净 因为打游戏 发痘痘
+不是听我的建议 而是证明我是错的 
+说不来就不来 说不打就不打（迪士尼） done
+为了将来 存款（打疫苗 等等）
+为了将来 （做了些什么）
